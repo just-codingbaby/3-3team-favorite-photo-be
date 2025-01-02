@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  nickName String  @db.VarChar(50)
+  password String  @db.VarChar(50)
+  email    String? @db.VarChar(100)
+  points   Int?
+
+  notifications Notification[]
+  cards         Card[]
+  purchases     Purchase[]
+  exchanges     Exchange[]     @relation("Requester")
+  shops         Shop[]         @relation("Seller")
+}
+
+model Notification {
+  id      Int     @id @default(autoincrement())
+  userId  Int
+  content String  @db.Text
+  isRead  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Card {
+  id                Int     @id @default(autoincrement())
+  ownerId           Int
+  name              String  @db.VarChar(100)
+  price             Int
+  grade             String  @db.VarChar(20)
+  genre             String  @db.VarChar(20)
+  description       String? @db.Text
+  totalQuantity     Int
+  remainingQuantity Int
+
+  owner            User       @relation(fields: [ownerId], references: [id])
+  purchases        Purchase[]
+  exchangesTarget  Exchange[] @relation("TargetCard")
+  exchangesOffered Exchange[] @relation("OfferedCard")
+  shops            Shop[]
+}
+
+model Purchase {
+  id      Int @id @default(autoincrement())
+  buyerId Int
+  cardId  Int
+
+  buyer User @relation(fields: [buyerId], references: [id])
+  card  Card @relation(fields: [cardId], references: [id])
+}
+
+model Exchange {
+  id            Int @id @default(autoincrement())
+  requesterId   Int
+  targetCardId  Int
+  offeredCardId Int
+
+  requester   User @relation("Requester", fields: [requesterId], references: [id])
+  targetCard  Card @relation("TargetCard", fields: [targetCardId], references: [id])
+  offeredCard Card @relation("OfferedCard", fields: [offeredCardId], references: [id])
+}
+
+model Shop {
+  id       Int @id @default(autoincrement())
+  sellerId Int
+  cardId   Int
+  price    Int
+
+  seller User @relation("Seller", fields: [sellerId], references: [id])
+  card   Card @relation(fields: [cardId], references: [id])
+}
