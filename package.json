@@ -7,22 +7,25 @@
   "type": "module",
   "main": "src/app.js",
   "scripts": {
-    "dev": "nodemon node src/app.js",
-    "migrate": "npx prisma migrate dev"
+    "dev": "nodemon app.js",
+    "migrate": "npx prisma migrate dev",
+    "start": "node src/app.js",
+    "format": "prettier --w src/**/*.js",
+    "lint": "eslint --fix src/**/*.js"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "nodemon": "^3.1.9"
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
     "prettier": "^3.4.2"
   }
 }
