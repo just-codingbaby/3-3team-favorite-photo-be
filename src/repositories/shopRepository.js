@@ -15,9 +15,11 @@ async function getAll() {
 }
 
 async function create() {
+  const userList = await prisma.user.findMany();
+
   return prisma.card.create({
     data: {
-      ownerId: 1,
+      ownerId: userList[0].id,
       name: faker.commerce.productName(),
       price: faker.number.int({ min: 1, max: 10 }),
       grade: faker.helpers.arrayElement(['COMMON', 'RARE', 'SUPER_RARE', 'LEGENDARY']),
