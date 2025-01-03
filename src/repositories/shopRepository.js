@@ -2,7 +2,7 @@ import prisma from '../config/prisma.js';
 import { faker } from '@faker-js/faker';
 
 async function getAll() {
-  return await prisma.card.findMany({
+  return prisma.card.findMany({
     orderBy: [
       {
         id: 'asc',
@@ -15,7 +15,7 @@ async function getAll() {
 }
 
 async function create() {
-  return await prisma.card.create({
+  return prisma.card.create({
     data: {
       ownerId: 1,
       name: faker.commerce.productName(),
