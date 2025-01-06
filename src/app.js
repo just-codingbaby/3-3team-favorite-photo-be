@@ -8,7 +8,7 @@ const BASE_URL = config.dbUrl;
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:8000',
+  origin: 'https://three-3team-favorite-photo-be.onrender.com',
   credentials: true
 }));
 app.listen(PORT, () => {
