@@ -10,6 +10,7 @@
     "dev": "nodemon app.js",
     "start": "node src/app.js",
     "migrate": "npx prisma migrate dev",
+    "generate": "npx prisma generate",
     "studio": "npx prisma studio",
     "format": "prettier --w src/**/*.js",
     "lint": "eslint --fix src/**/*.js"
