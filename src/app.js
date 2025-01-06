@@ -9,10 +9,13 @@ const PORT = config.port;
 const BASE_URL = config.dbUrl;
 
 app.use(express.json());
-app.use(cors());
 app.use('/shop/cards', shopController);
 app.use('/users', userController);
 
+app.use(cors({
+  origin: 'https://three-3team-favorite-photo-be.onrender.com',
+  credentials: true
+}));
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
