@@ -8,14 +8,17 @@ const app = express();
 const PORT = config.port;
 const BASE_URL = config.dbUrl;
 
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'https://3-3team-favorite-photo-fe.vercel.app'],
+    credentials: true,
+  }),
+);
+
 app.use(express.json());
 app.use('/shop/cards', shopController);
 app.use('/users', userController);
 
-app.use(cors({
-  origin: 'https://three-3team-favorite-photo-be.onrender.com',
-  credentials: true
-}));
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
