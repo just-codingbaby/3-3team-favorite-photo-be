@@ -8,17 +8,21 @@ const app = express();
 const PORT = config.port;
 const BASE_URL = config.dbUrl;
 
-app.use(
-  cors({
-    origin: ['http://localhost:3000', 'https://3-3team-favorite-photo-fe.vercel.app'],
-    credentials: true,
-  }),
-);
+const corsOptions = {
+  origin: config.origins,
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use('/shop/cards', shopController);
 app.use('/users', userController);
 
+app.get('/', (req, res) => {
+  res.send(`App is running in ${config.env} mode.`);
+});
+
 app.listen(PORT, () => {
+  // console.log(`The connection URL is ${process.env.DATABASE_URL}`);
   console.log(`Server is running on port ${PORT}`);
 });

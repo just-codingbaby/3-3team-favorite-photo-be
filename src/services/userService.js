@@ -1,7 +1,7 @@
 import userRepository from '../repositories/userRepository.js';
 
 async function getAllUsers() {
-  return await userRepository.getAll();
+  return userRepository.getAll();
 }
 
 async function createUser() {
