@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon app.js",
     "start:dev": "cross-env NODE_ENV=development node src/app.js",
-    "start:prod": "cross-env NODE_ENV=production node src/app.js",
+    "start": "cross-env NODE_ENV=production node src/app.js",
     "migrate": "npx prisma migrate dev",
     "generate": "npx prisma generate",
     "studio": "npx prisma studio",
@@ -23,11 +23,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
-    "cross-env": "^7.0.3",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.14.0",
