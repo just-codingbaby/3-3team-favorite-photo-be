@@ -1,11 +1,11 @@
 import shopRepository from '../repositories/shopRepository.js';
 
 async function getAllCards() {
-  return await shopRepository.getAll();
+  return shopRepository.getAll();
 }
 
 async function createCard() {
-  return await shopRepository.create();
+  return shopRepository.create();
 }
 
 export default {

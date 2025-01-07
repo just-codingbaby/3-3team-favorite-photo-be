@@ -8,14 +8,22 @@ const app = express();
 const PORT = config.port;
 const BASE_URL = config.dbUrl;
 
+const corsOptions = {
+  origin: config.origins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24시간 동안 preflight 요청 결과를 캐시
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use('/shop/cards', shopController);
 app.use('/users', userController);
 
-app.use(cors({
-  origin: 'https://three-3team-favorite-photo-be.onrender.com',
-  credentials: true
-}));
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  if (config.env === 'development') {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`App is running in ${config.env} mode.`);
+  }
 });
