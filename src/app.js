@@ -18,11 +18,9 @@ app.use(express.json());
 app.use('/shop/cards', shopController);
 app.use('/users', userController);
 
-app.get('/', (req, res) => {
-  res.send(`App is running in ${config.env} mode.`);
-});
-
 app.listen(PORT, () => {
-  // console.log(`The connection URL is ${process.env.DATABASE_URL}`);
-  console.log(`Server is running on port ${PORT}`);
+  if (config.env === 'development') {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`App is running in ${config.env} mode.`);
+  }
 });
