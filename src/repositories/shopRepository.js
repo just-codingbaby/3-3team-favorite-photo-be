@@ -3,14 +3,13 @@ import { faker } from '@faker-js/faker';
 
 async function getAll() {
   return prisma.card.findMany({
-    orderBy: [
-      {
-        id: 'asc',
+    include: {
+      owner: {
+        select: {
+          nickName: true,
+        },
       },
-      {
-        price: 'asc',
-      },
-    ],
+    },
   });
 }
 
