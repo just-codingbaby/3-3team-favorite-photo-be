@@ -36,14 +36,16 @@ async function create() {
     });
   }
 
+  const randomGenre = faker.helpers.enumValue(Genre);
+
   const mockData = {
     ownerId: randomUser.id,
     name: faker.commerce.productName(),
     price: faker.number.int({ min: 1, max: 10 }),
     grade: faker.helpers.enumValue(Grade),
-    genre: faker.helpers.enumValue(Genre),
+    genre: randomGenre,
     description: faker.commerce.productDescription(),
-    imgUrl: `/images/card/img_default-${['travel', 'landscape', 'portrait', 'object'].at(0)}.webp`,
+    imgUrl: `/images/card/img_default-${randomGenre.toLowerCase()}.webp`,
     remainingQuantity: faker.number.int({ max: 3 }),
     totalQuantity: 3,
   };
