@@ -9,9 +9,9 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  nickName  String   @unique @db.VarChar(50)
-  password  String   @db.VarChar(255)
-  email     String?  @unique @db.VarChar(100)
+  nickName  String   @unique @db.Text
+  password  String   @db.Text
+  email     String?  @unique @db.Text
   points    Int?     @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -35,12 +35,12 @@ model Notification {
 }
 
 model Card {
-  id                Int      @id @default(autoincrement())
+  id                Int      @id @unique @default(autoincrement())
   ownerId           Int
-  name              String   @db.VarChar(100)
+  name              String   @db.Text
   price             Int
-  grade             String   @db.VarChar(20)
-  genre             String   @db.VarChar(20)
+  grade             String   @db.Text
+  genre             String   @db.Text
   description       String?  @db.Text
   totalQuantity     Int
   remainingQuantity Int
