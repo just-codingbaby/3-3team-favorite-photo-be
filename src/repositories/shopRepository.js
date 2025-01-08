@@ -31,8 +31,8 @@ async function create() {
   }
 
   const randomGenre = faker.helpers.enumValue(Genre);
-  const remainingQuantity = faker.number.int({ min: 0, max: 3 });
   const totalQuantity = faker.number.int({ min: 1, max: 3 });
+  const remainingQuantity = faker.number.int({ min: 0, max: totalQuantity });
 
   const mockData = {
     ownerId: randomUser.id,
@@ -42,8 +42,8 @@ async function create() {
     genre: randomGenre,
     description: faker.commerce.productDescription(),
     imgUrl: `/images/card/img_default-${randomGenre.toLowerCase()}.webp`,
-    remainingQuantity: Math.min(remainingQuantity, totalQuantity),
-    totalQuantity: Math.max(remainingQuantity, totalQuantity),
+    remainingQuantity: remainingQuantity,
+    totalQuantity: totalQuantity,
   };
 
   return prisma.card.create({
