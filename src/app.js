@@ -12,6 +12,9 @@ const BASE_URL = config.dbUrl;
 const corsOptions = {
   origin: config.origins,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24시간 동안 preflight 요청 결과를 캐시
 };
 app.use(cors(corsOptions));
 

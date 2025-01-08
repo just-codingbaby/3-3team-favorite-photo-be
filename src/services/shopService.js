@@ -5,7 +5,7 @@ async function getAllCards() {
 }
 
 async function createCard() {
-  return await shopRepository.create();
+  return shopRepository.create();
 }
 
 export default {

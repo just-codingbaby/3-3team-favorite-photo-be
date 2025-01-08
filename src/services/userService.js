@@ -5,7 +5,7 @@ async function getAllUsers() {
 }
 
 async function createUser() {
-  return await userRepository.create();
+  return userRepository.create();
 }
 
 export default {
