@@ -8,18 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  nickName  String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
-  email     String?  @unique @db.VarChar(255)
-  points    Int?     @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id            Int            @id @default(autoincrement())
+  nickName      String         @unique @db.VarChar(255)
+  password      String         @db.VarChar(255)
+  email         String?        @unique @db.VarChar(255)
+  points        Int?           @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   notifications Notification[]
   cards         Card[]
   exchanges     Exchange[]     @relation("Requester")
-  notifications Notification[]
   purchases     Purchase[]
   shops         Shop[]         @relation("Seller")
 }
