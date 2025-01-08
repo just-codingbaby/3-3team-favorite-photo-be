@@ -9,9 +9,9 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  nickName  String   @unique @db.Text
-  password  String   @db.Text
-  email     String?  @unique @db.Text
+  nickName  String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  email     String?  @unique @db.VarChar(255)
   points    Int?     @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,13 +34,27 @@ model Notification {
   user User @relation(fields: [userId], references: [id])
 }
 
+enum Grade {
+  COMMON
+  RARE
+  SUPER_RARE
+  LEGENDARY
+}
+
+enum Genre {
+  TRAVEL
+  LANDSCAPE
+  PORTRAIT
+  OBJECT
+}
+
 model Card {
-  id                Int      @id @unique @default(autoincrement())
+  id                Int      @id @default(autoincrement())
   ownerId           Int
-  name              String   @db.Text
+  name              String   @db.VarChar(255)
   price             Int
-  grade             String   @db.Text
-  genre             String   @db.Text
+  grade             Grade
+  genre             Genre
   description       String?  @db.Text
   totalQuantity     Int
   remainingQuantity Int
