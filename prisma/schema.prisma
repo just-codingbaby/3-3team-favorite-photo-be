@@ -18,15 +18,16 @@ model User {
 
   notifications Notification[]
   cards         Card[]
-  purchases     Purchase[]
   exchanges     Exchange[]     @relation("Requester")
+  notifications Notification[]
+  purchases     Purchase[]
   shops         Shop[]         @relation("Seller")
 }
 
 model Notification {
   id        Int      @id @default(autoincrement())
   userId    Int
-  content   String   @db.Text
+  content   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,7 +56,7 @@ model Card {
   price             Int
   grade             Grade
   genre             Genre
-  description       String?  @db.Text
+  description       String?
   totalQuantity     Int
   remainingQuantity Int
   imgUrl            String   @db.Text
@@ -75,9 +76,8 @@ model Purchase {
   cardId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  buyer User @relation(fields: [buyerId], references: [id])
-  card  Card @relation(fields: [cardId], references: [id])
+  buyer     User     @relation(fields: [buyerId], references: [id])
+  card      Card     @relation(fields: [cardId], references: [id])
 }
 
 model Exchange {
@@ -87,10 +87,9 @@ model Exchange {
   offeredCardId Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  requester   User @relation("Requester", fields: [requesterId], references: [id])
-  targetCard  Card @relation("TargetCard", fields: [targetCardId], references: [id])
-  offeredCard Card @relation("OfferedCard", fields: [offeredCardId], references: [id])
+  offeredCard   Card     @relation("OfferedCard", fields: [offeredCardId], references: [id])
+  requester     User     @relation("Requester", fields: [requesterId], references: [id])
+  targetCard    Card     @relation("TargetCard", fields: [targetCardId], references: [id])
 }
 
 model Shop {
@@ -100,7 +99,6 @@ model Shop {
   price     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  seller User @relation("Seller", fields: [sellerId], references: [id])
-  card   Card @relation(fields: [cardId], references: [id])
+  card      Card     @relation(fields: [cardId], references: [id])
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
 }

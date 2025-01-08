@@ -16,27 +16,23 @@ async function getAll() {
 }
 
 async function create() {
-  let randomUser = await prisma.user.findFirst({
-    orderBy: {
-      id: ['asc', 'desc'].at(Number(faker.number.binary({ max: 1 }))),
-    },
+  const users = await prisma.user.findMany({
     select: {
       id: true,
     },
   });
-  if (randomUser === null) {
-    await userService.createUser();
-    randomUser = await prisma.user.findFirst({
-      orderBy: {
-        id: ['asc', 'desc'].at(Number(faker.number.binary({ max: 1 }))),
-      },
-      select: {
-        id: true,
-      },
-    });
+
+  let randomUser;
+
+  if (users.length < 1) {
+    randomUser = await userService.createUser();
+  } else {
+    randomUser = faker.helpers.arrayElement(users);
   }
 
   const randomGenre = faker.helpers.enumValue(Genre);
+  const remainingQuantity = faker.number.int({ min: 0, max: 3 });
+  const totalQuantity = faker.number.int({ min: 1, max: 3 });
 
   const mockData = {
     ownerId: randomUser.id,
@@ -46,8 +42,8 @@ async function create() {
     genre: randomGenre,
     description: faker.commerce.productDescription(),
     imgUrl: `/images/card/img_default-${randomGenre.toLowerCase()}.webp`,
-    remainingQuantity: faker.number.int({ max: 3 }),
-    totalQuantity: 3,
+    remainingQuantity: Math.min(remainingQuantity, totalQuantity),
+    totalQuantity: Math.max(remainingQuantity, totalQuantity),
   };
 
   return prisma.card.create({

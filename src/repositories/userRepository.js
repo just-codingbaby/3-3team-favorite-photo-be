@@ -2,7 +2,7 @@ import prisma from '../config/prisma.js';
 import { faker } from '@faker-js/faker';
 
 async function getAll() {
-  return prisma.user.findFirst();
+  return prisma.user.findMany();
 }
 
 async function create() {
