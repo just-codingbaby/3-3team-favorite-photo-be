@@ -22,7 +22,13 @@ app.use(cors(corsOptions));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const swaggerFile = JSON.parse(readFileSync(join(__dirname, './swagger-output.json'), 'utf8'));
+let swaggerFile;
+try {
+  swaggerFile = JSON.parse(readFileSync(join(__dirname, './swagger-output.json'), 'utf8'));
+} catch (error) {
+  console.error('Swagger 파일 로드 중 오류 발생:', error);
+  process.exit(1);
+}
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 

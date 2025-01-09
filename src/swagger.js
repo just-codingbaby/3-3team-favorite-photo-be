@@ -8,7 +8,7 @@ const doc = {
   },
   servers: [
     {
-      url: 'http://localhost:8000/api/v1',
+      url: process.env.API_URL || 'http://localhost:8000/api/v1',
     },
   ],
   tags: [
