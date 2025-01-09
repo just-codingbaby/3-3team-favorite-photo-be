@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import shopController from './controllers/shopController.js';
 import userController from './controllers/userController.js';
-import authRouter from './routes/auth.routes.js'
+import authRouter from './routes/auth.routes.js';
 
 const app = express();
 const PORT = config.port;
@@ -13,11 +13,9 @@ const corsOptions = {
   origin: config.origins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  maxAge: 86400, // 24시간 동안 preflight 요청 결과를 캐시
 };
-app.use(cors(corsOptions));
 
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/shop/cards', shopController);
 app.use('/users', userController);
