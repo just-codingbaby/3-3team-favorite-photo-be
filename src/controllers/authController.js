@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { createUser } from '../services/authService.js';
+import { createUser, findUserByEmail } from '../services/authService.js';
 
 export const signUp = async (req, res) => {
   try {
@@ -37,7 +37,6 @@ export const signUp = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -62,13 +61,13 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET, // .env 파일의 JWT_SECRET 값
-      { expiresIn: '1h' }
+      { expiresIn: '1h' },
     );
 
     const refreshToken = jwt.sign(
       { id: user.id },
       process.env.JWT_REFRESH_SECRET, // .env 파일의 JWT_REFRESH_SECRET 값
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     );
 
     // 응답 반환
