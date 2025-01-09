@@ -20,7 +20,7 @@ export const checkDuplicateUser = async (req, res, next) => {
       }
     }
 
-    next(); 
+    next();
   } catch (error) {
     console.error('중복 확인 중 에러:', error);
     return res.status(500).json({ message: '중복 확인 중 에러가 발생했습니다.' });

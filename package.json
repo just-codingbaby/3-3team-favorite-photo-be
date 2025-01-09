@@ -14,28 +14,32 @@
     "generate": "npx prisma generate",
     "studio": "npx prisma studio",
     "format": "prettier --w src/**/*.js",
-    "lint": "eslint --fix src/**/*.js"
+    "lint": "eslint --fix src/**/*.js",
+    "swagger": "node ./src/swagger.js"
   },
   "dependencies": {
     "@faker-js/faker": "^9.3.0",
-    "@prisma/client": "^6.1.0",
+    "@prisma/client": "^6.2.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
-    "dotenv-cli": "^8.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.14.0",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
-    "prisma": "^6.1.0"
+    "prisma": "^6.2.0",
+    "swagger-autogen": "^2.23.7"
   }
 }

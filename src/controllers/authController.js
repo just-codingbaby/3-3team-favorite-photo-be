@@ -1,15 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail } from '../services/authService.js';
-import prisma from '../config/prisma.js';
 
 export const signUp = async (req, res) => {
+  // #swagger.tags = ['Auth']
   try {
     const { email, password, nickName } = req.body;
 
     if (!email || !password || !nickName) {
       return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
     }
-    
+
     const newUser = await createUser({ email, password, nickName });
 
     // JWT 생성
@@ -28,8 +28,8 @@ export const signUp = async (req, res) => {
     // 응답 반환
     return res.status(201).json({
       message: '회원가입이 완료되었습니다.',
-      accessToken, 
-      refreshToken, 
+      accessToken,
+      refreshToken,
       user: { id: newUser.id, email: newUser.email, nickName: newUser.nickName },
     });
   } catch (error) {
@@ -38,8 +38,8 @@ export const signUp = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
+  // #swagger.tags = ['Auth']
   try {
     const { email, password } = req.body;
 
@@ -63,13 +63,13 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET, // .env 파일의 JWT_SECRET 값
-      { expiresIn: '1h' }
+      { expiresIn: '1h' },
     );
 
     const refreshToken = jwt.sign(
       { id: user.id },
       process.env.JWT_REFRESH_SECRET, // .env 파일의 JWT_REFRESH_SECRET 값
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     );
 
     // 응답 반환
