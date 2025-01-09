@@ -11,6 +11,8 @@ const app = express();
 const PORT = config.port;
 const BASE_URL = config.dbUrl;
 
+app.use(express.json());
+
 const corsOptions = {
   origin: config.origins,
   credentials: true,
