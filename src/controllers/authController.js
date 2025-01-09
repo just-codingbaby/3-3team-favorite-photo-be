@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail } from '../services/authService.js';
 
 export const signUp = async (req, res) => {
+  // #swagger.tags = ['Auth']
   try {
     const { email, password, nickName } = req.body;
 
@@ -38,6 +39,7 @@ export const signUp = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  // #swagger.tags = ['Auth']
   try {
     const { email, password } = req.body;
 

@@ -1,9 +1,11 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { config } from './config/config.js';
 import express from 'express';
 import cors from 'cors';
-import shopController from './controllers/shopController.js';
-import userController from './controllers/userController.js';
-import authRouter from './routes/auth.routes.js';
+import swaggerUi from 'swagger-ui-express';
+import apiRoutes from './routes/routes.js';
 
 const app = express();
 const PORT = config.port;
@@ -16,10 +18,22 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use('/shop/cards', shopController);
-app.use('/users', userController);
-app.use('/api/auth', authRouter);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+let swaggerFile;
+try {
+  swaggerFile = JSON.parse(readFileSync(join(__dirname, './swagger-output.json'), 'utf8'));
+} catch (error) {
+  console.error('Swagger 파일 로드 중 오류 발생:', error);
+  process.exit(1);
+}
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+const API_VERSION = 'v1';
+app.use(`/api/${API_VERSION}`, apiRoutes);
 
 app.listen(PORT, () => {
   if (config.env === 'development') {
