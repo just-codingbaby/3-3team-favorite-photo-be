@@ -11,7 +11,7 @@ async function create() {
       nickName: faker.internet.username(),
       password: faker.internet.password(),
       email: faker.internet.email(),
-      points: faker.number.int({ min: 0, max: 100 }),
+      points: faker.number.int({ min: 0, max: 50 }),
     },
   });
 }

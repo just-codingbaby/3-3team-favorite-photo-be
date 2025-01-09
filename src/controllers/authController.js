@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { createUser, findUserByEmail } from '../services/authService.js';
-import prisma from '../config/prisma.js';
+import { createUser } from '../services/authService.js';
 
 export const signUp = async (req, res) => {
   try {
@@ -9,7 +8,7 @@ export const signUp = async (req, res) => {
     if (!email || !password || !nickName) {
       return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
     }
-    
+
     const newUser = await createUser({ email, password, nickName });
 
     // JWT 생성
@@ -28,8 +27,8 @@ export const signUp = async (req, res) => {
     // 응답 반환
     return res.status(201).json({
       message: '회원가입이 완료되었습니다.',
-      accessToken, 
-      refreshToken, 
+      accessToken,
+      refreshToken,
       user: { id: newUser.id, email: newUser.email, nickName: newUser.nickName },
     });
   } catch (error) {
