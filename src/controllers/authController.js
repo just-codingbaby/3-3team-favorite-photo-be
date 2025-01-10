@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail } from '../services/authService.js';
+import bcrypt from 'bcrypt';
 
 export const signUp = async (req, res) => {
   // #swagger.tags = ['Auth']
@@ -54,7 +55,7 @@ export const login = async (req, res) => {
     }
 
     // 비밀번호 검증 (비밀번호 암호화 사용 시, bcrypt를 사용하여 비교해야 함)
-    const isPasswordValid = user.password === password; // 암호화된 경우 bcrypt.compare 사용 필요
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: '비밀번호가 올바르지 않습니다.' });
     }
