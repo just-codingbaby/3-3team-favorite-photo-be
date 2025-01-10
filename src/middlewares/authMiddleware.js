@@ -11,7 +11,6 @@ export const checkEmailExists = async (req, res, next) => {
     req.user = user; // 다음 단계에서 사용하기 위해 사용자 정보를 req에 저장
     next();
   } catch (error) {
-    console.error('이메일 존재 확인 중 에러:', error);
     return res.status(500).json({ message: '이메일 확인 중 문제가 발생했습니다.' });
   }
 };

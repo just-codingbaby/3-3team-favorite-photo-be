@@ -15,4 +15,20 @@ userController.post('/', async (req, res) => {
   return res.json(user);
 });
 
+userController.get('/profile', async (req, res) => {
+    //  #swagger.tags = ['Users']
+  const { email } = req.query;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ message: '이메일이 제공되지 않았습니다' });
+    }
+
+    const user = await userService.getProfile(email);
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(404).json({ message: error.message });
+  }
+});
+
 export default userController;
