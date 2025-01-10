@@ -15,9 +15,9 @@ userController.post('/', async (req, res) => {
   return res.json(user);
 });
 
-userController.get('/profile', async (req, res) => {
+userController.get('/profile/:email', async (req, res) => {
     //  #swagger.tags = ['Users']
-  const { email } = req.query;
+  const { email } = req.params;
 
   try {
     if (!email) {
