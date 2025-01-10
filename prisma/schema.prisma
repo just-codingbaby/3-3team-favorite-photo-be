@@ -47,24 +47,30 @@ enum Genre {
   OBJECT
 }
 
+enum CardStatus {
+  AVAILABLE
+  SOLD_OUT
+  IN_TRADE
+}
+
 model Card {
-  id                Int      @id @default(autoincrement())
+  id               Int         @id @default(autoincrement())
   ownerId           Int
-  name              String   @db.VarChar(255)
+  name             String      @db.VarChar(255)
   price             Int
   grade             Grade
   genre             Genre
   description       String?
   totalQuantity     Int
   remainingQuantity Int
-  imgUrl            String   @db.Text
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  owner            User       @relation(fields: [ownerId], references: [id])
+  imgUrl           String      @db.Text
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  status           CardStatus? @default(AVAILABLE)
+  owner            User        @relation(fields: [ownerId], references: [id])
   purchases        Purchase[]
-  exchangesTarget  Exchange[] @relation("TargetCard")
-  exchangesOffered Exchange[] @relation("OfferedCard")
+  exchangesTarget  Exchange[]  @relation("TargetCard")
+  exchangesOffered Exchange[]  @relation("OfferedCard")
   shops            Shop[]
 }
 

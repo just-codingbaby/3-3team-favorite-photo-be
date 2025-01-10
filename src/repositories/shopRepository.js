@@ -4,15 +4,21 @@ import { Genre, Grade } from '@prisma/client';
 import userService from '../services/userService.js';
 
 async function getAll() {
-  return prisma.card.findMany({
-    include: {
-      owner: {
-        select: {
-          nickName: true,
+  const [total, cards] = await Promise.all([
+    prisma.card.count(),
+    prisma.card.findMany({
+      include: {
+        owner: {
+          select: {
+            nickName: true,
+          },
         },
       },
-    },
-  });
+      take: 6,
+      skip: 0,
+    }),
+  ]);
+  return { total, cards };
 }
 
 async function create() {
