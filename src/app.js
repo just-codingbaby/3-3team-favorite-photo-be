@@ -6,12 +6,14 @@ import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import apiRoutes from './routes/routes.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const PORT = config.port;
 const BASE_URL = config.dbUrl;
 
 app.use(express.json());
+app.use(cookieParser());
 
 const corsOptions = {
   origin: config.origins,
