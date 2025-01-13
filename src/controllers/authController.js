@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail } from '../services/authService.js';
 import bcrypt from 'bcrypt';
+import prisma from '../config/prisma.js';
+import { findUserById } from '../services/userService.js';
 
 export const signUp = async (req, res) => {
   // #swagger.tags = ['Auth']
@@ -13,24 +15,9 @@ export const signUp = async (req, res) => {
 
     const newUser = await createUser({ email, password, nickName });
 
-    // JWT 생성
-    const accessToken = jwt.sign(
-      { id: newUser.id, email: newUser.email },
-      process.env.JWT_SECRET, // .env 파일에 JWT_SECRET을 설정해야 함
-      { expiresIn: '1h' }, // 토큰 만료 시간
-    );
-
-    const refreshToken = jwt.sign(
-      { id: newUser.id },
-      process.env.JWT_REFRESH_SECRET, // 리프레시 토큰 비밀 키
-      { expiresIn: '7d' }, // 리프레시 토큰 만료 시간
-    );
-
     // 응답 반환
     return res.status(201).json({
       message: '회원가입이 완료되었습니다.',
-      accessToken,
-      refreshToken,
       user: { id: newUser.id, email: newUser.email, nickName: newUser.nickName },
     });
   } catch (error) {
@@ -62,7 +49,7 @@ export const login = async (req, res) => {
 
     // JWT 생성
     const accessToken = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id },
       process.env.JWT_SECRET, // .env 파일의 JWT_SECRET 값
       { expiresIn: '1h' },
     );
@@ -73,15 +60,49 @@ export const login = async (req, res) => {
       { expiresIn: '7d' },
     );
 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: "strict", 
+      maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 쿠키 유효 기간 7일
+    });
+
     // 응답 반환
     return res.status(200).json({
       message: '로그인 성공',
-      accessToken,
-      refreshToken,
       user: { id: user.id, email: user.email, nickName: user.nickName },
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: '로그인 실패' });
+  }
+};
+
+export const verify = async (req,res) => {
+  // #swagger.tags = ['Auth']
+  console.log('요청 쿠키: ',req.cookies);
+  const accessToken = req.cookies.accessToken;
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "토큰이 존재하지 않습니다" });
+  }
+
+  try {
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const user = await findUserById(decoded.id);
+    return res.status(200).json({
+      message: "인증 성공",
+      user,
+    });
+  } catch (error) {
+    console.error("토큰 검증 실패:", error);
+    return res.status(401).json({ message: "토큰이 유효하지 않습니다." });
   }
 };

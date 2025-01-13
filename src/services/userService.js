@@ -27,6 +27,24 @@ export const findAllUsers = async () => {
   }
 };
 
+export const findUserById = async (id) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where : {
+        id,
+      },
+      select: {
+        id: true,
+        email: true,
+        nickName: true,
+      },
+    });
+
+    return user;
+  } catch(err) {
+    throw new Error('findUserById에서 오류가 발생했습니다');
+  }
+}
 
 async function getProfile(email) {
   const data = await findUserByEmail(email);
