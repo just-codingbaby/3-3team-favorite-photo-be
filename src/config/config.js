@@ -26,5 +26,5 @@ export const config = {
   env: process.env.NODE_ENV || 'development',
 };
 
-console.log('Loaded ENV Variables:', process.env);
+
 
