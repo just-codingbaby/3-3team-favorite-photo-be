@@ -1,6 +1,8 @@
-// import path from 'path';
+import path from 'path';
 // import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+
+dotenv.config({path});
 
 /**
  * 환경별 CORS 구성 분리 필요시
@@ -13,11 +15,16 @@ const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.en
 dotenv.config({ path: path.resolve(__dirname, envFile) });
  **/
 
-dotenv.config();
+
+
 
 export const config = {
+  
   port: process.env.PORT || 8000,
   dbUrl: process.env.DB_URL,
   origins: process.env.ALLOWED_ORIGINS?.split(',') ?? 'http://localhost:3000',
   env: process.env.NODE_ENV || 'development',
 };
+
+
+

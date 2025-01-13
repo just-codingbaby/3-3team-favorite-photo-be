@@ -106,3 +106,21 @@ export const verify = async (req,res) => {
     return res.status(401).json({ message: "토큰이 유효하지 않습니다." });
   }
 };
+
+
+export const logout = (req, res) => {
+  // #swagger.tags = ['Auth']
+  try {
+    // 쿠키 삭제
+    res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "Strict" });
+    res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "Strict" });
+
+    // 로그아웃 완료 응답
+    return res.status(200).json({ message: "로그아웃 성공" });
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
+    return res.status(500).json({ message: "로그아웃 실패" });
+  }
+};
+
+
