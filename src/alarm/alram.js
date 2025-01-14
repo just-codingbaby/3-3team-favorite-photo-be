@@ -1,5 +1,6 @@
 import prisma from '../../../lib/prisma';
 
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { userId } = req.query; // 요청에서 userId 추출
