@@ -40,6 +40,7 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: '존재하지 않는 이메일입니다.' });
     }
+    console.log('User:', user);
 
     // 비밀번호 검증 (비밀번호 암호화 사용 시, bcrypt를 사용하여 비교해야 함)
     const isPasswordValid = await bcrypt.compare(password, user.password);

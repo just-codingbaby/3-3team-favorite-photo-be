@@ -2,6 +2,7 @@ import express from 'express';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import {
   getAllUsers,
+  getProfile,
   getMyCardList,
   getMyCardById,
   getUserSalesCards,
@@ -10,11 +11,13 @@ import {
 
 const router = express.Router();
 
-// 카드 생성 API 경로
+// 나의 포토 카드 생성
 router.post('/my-cards', authMiddleware, createMyCard);
 
 // 사용자 전체 목록 조회 및 사용자 생성
 router.get('/', getAllUsers);
+
+router.get('/profile/:email', getProfile);
 
 // /users/my-cards 경로로 보유한 카드목록 요청
 router.get('/my-cards', getMyCardList);

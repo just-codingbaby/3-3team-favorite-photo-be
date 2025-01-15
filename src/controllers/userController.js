@@ -20,9 +20,10 @@ userController.post('/', async (req, res) => {
   return res.json(user);
 });
 
-userController.get('/profile/:email', async (req, res) => {
+export const getProfile = async (req, res) => {
   //  #swagger.tags = ['Users']
   const { email } = req.params;
+  console.log('Requested email:', email);
 
   try {
     if (!email) {
@@ -34,7 +35,7 @@ userController.get('/profile/:email', async (req, res) => {
   } catch (error) {
     return res.status(404).json({ message: error.message });
   }
-});
+};
 
 // 나의 포토카드 생성
 export const createMyCard = async (req, res) => {

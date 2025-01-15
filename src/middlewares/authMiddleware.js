@@ -33,6 +33,7 @@ export const authMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // console.log('Decoded Token:', decoded);
     req.user = decoded; // JWT에서 디코딩된 사용자 정보
+    // console.log('인증된 사용자:', req.user);
     next();
   } catch (error) {
     console.error('JWT 검증 실패:', error);
