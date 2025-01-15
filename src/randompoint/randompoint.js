@@ -61,7 +61,7 @@ app.post("/api/claim-points", async (req, res) => {
     const updatedUser = await prismaClient.user.update({
       where: { id: userId },
       data: {
-        points: user.points + earnedPoints,
+        points: (user.points || 0) + earnedPoints,
         lastClaimed: currentTime,
       },
     });
