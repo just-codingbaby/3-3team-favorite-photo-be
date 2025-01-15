@@ -60,17 +60,17 @@ export const login = async (req, res) => {
       { expiresIn: '7d' },
     );
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: "strict", 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
     });
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 쿠키 유효 기간 7일
     });
 
@@ -85,42 +85,70 @@ export const login = async (req, res) => {
   }
 };
 
-export const verify = async (req,res) => {
+export const verify = async (req, res) => {
   // #swagger.tags = ['Auth']
-  console.log('요청 쿠키: ',req.cookies);
+  if (process.env.NODE_ENV == 'development') {
+    console.log('요청 쿠키: ', req.cookies);
+  }
   const accessToken = req.cookies.accessToken;
 
   if (!accessToken) {
-    return res.status(401).json({ message: "토큰이 존재하지 않습니다" });
+    return res.status(401).json({ message: '토큰이 존재하지 않습니다' });
   }
 
   try {
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
     const user = await findUserById(decoded.id);
     return res.status(200).json({
-      message: "인증 성공",
+      message: '인증 성공',
       user,
     });
   } catch (error) {
-    console.error("토큰 검증 실패:", error);
-    return res.status(401).json({ message: "토큰이 유효하지 않습니다." });
+    console.error('토큰 검증 실패:', error);
+    return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
   }
 };
-
 
 export const logout = (req, res) => {
   // #swagger.tags = ['Auth']
   try {
     // 쿠키 삭제
-    res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "Strict" });
-    res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "Strict" });
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
 
     // 로그아웃 완료 응답
-    return res.status(200).json({ message: "로그아웃 성공" });
+    return res.status(200).json({ message: '로그아웃 성공' });
   } catch (error) {
-    console.error("로그아웃 실패:", error);
-    return res.status(500).json({ message: "로그아웃 실패" });
+    console.error('로그아웃 실패:', error);
+    return res.status(500).json({ message: '로그아웃 실패' });
   }
 };
 
+export const refresh = async (req, res) => {
+  // #swagger.tags = ['Auth']
+  try {
+    const refreshToken = req.cookies.refreshToken;
 
+    if (!refreshToken) {
+      return res.status(401).json({ message: '리프레시 토큰이 존재하지 않습니다.' });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const accessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
+    });
+
+    return res.status(200).json({
+      message: '토큰 갱신 성공',
+    });
+  } catch (error) {
+    console.error('토큰 갱신 실패:', error);
+    return res.status(401).json({ message: '리프레시 토큰이 유효하지 않습니다.' });
+  }
+};
