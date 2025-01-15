@@ -36,6 +36,41 @@ userController.get('/profile/:email', async (req, res) => {
   }
 });
 
+// 나의 포토카드 생성
+export const createMyCard = async (req, res) => {
+  try {
+    const { name, description, image, grade, genre, price, quantity } = req.body;
+
+    // 사용자 ID 확인
+    if (!req.user?.id) {
+      return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
+    }
+    console.log('인증된 사용자:', req.user);
+
+    // 필수 값 검증
+    if (!name || !grade || !genre || !price || !quantity) {
+      return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
+    }
+
+    // 서비스 호출
+    const newCard = await userService.createMyCard({
+      name,
+      description,
+      image,
+      grade,
+      genre,
+      price,
+      quantity,
+      ownerId: req.user.id, // 요청 사용자 ID
+    });
+
+    return res.status(201).json(newCard);
+  } catch (error) {
+    console.error('나의 카드 생성 실패:', error.message);
+    return res.status(500).json({ message: '나의 카드 생성 실패' });
+  }
+};
+
 // 나의 카드 목록 조회
 export const getMyCardList = async (req, res) => {
   try {
