@@ -1,4 +1,5 @@
 import prisma from '../config/prisma.js';
+import jwt from 'jsonwebtoken';
 
 export const checkEmailExists = async (req, res, next) => {
   const { email } = req.body;
@@ -12,5 +13,29 @@ export const checkEmailExists = async (req, res, next) => {
     next();
   } catch (error) {
     return res.status(500).json({ message: '이메일 확인 중 문제가 발생했습니다.' });
+  }
+};
+
+export const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  // console.log('Authorization Header:', authHeader);
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: '인증 토큰이 필요합니다.' });
+  }
+
+  // console.log('JWT_SECRET:', process.env.JWT_SECRET);
+
+  const token = authHeader.split(' ')[1];
+  // console.log('Token Received:', token); // 받은 토큰 출력
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // console.log('Decoded Token:', decoded);
+    req.user = decoded; // JWT에서 디코딩된 사용자 정보
+    next();
+  } catch (error) {
+    console.error('JWT 검증 실패:', error);
+    return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
   }
 };
