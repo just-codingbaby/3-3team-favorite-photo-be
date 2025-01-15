@@ -175,6 +175,45 @@
           }
         }
       }
+    },
+    "/auth/verify": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "JWT 검증",
+        "description": "Access Token을 검증하여 유저 정보를 반환합니다.",
+        "parameters": [
+          {
+            "name": "accessToken",
+            "in": "cookie",
+            "required": true,
+            "type": "string",
+            "description": "JWT Access Token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "인증 성공",
+            "examples": {
+              "application/json": {
+                "message": "인증 성공",
+                "user": {
+                  "id": "12345",
+                  "email": "test@example.com",
+                  "nickName": "테스트 유저"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "examples": {
+              "application/json": {
+                "message": "토큰이 유효하지 않습니다."
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
