@@ -63,6 +63,9 @@ async function getProfile(email) {
 
 async function createMyCard({ name, description, image, grade, genre, price, quantity, ownerId }) {
   try {
+    if (!ownerId) {
+      throw new Error('ownerId가 제공되지 않았습니다.');
+    }
     const newCard = await prisma.card.create({
       data: {
         name,
