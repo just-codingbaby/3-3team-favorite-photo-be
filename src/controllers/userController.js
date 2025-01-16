@@ -46,7 +46,9 @@ export const createMyCard = async (req, res) => {
     if (!req.user?.id) {
       return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
     }
+    if (process.env.NODE_ENV === 'development') {
     console.log('인증된 사용자:', req.user);
+    }
 
     // 필수 값 검증
     if (!name || !grade || !genre || !price || !quantity) {
@@ -76,8 +78,15 @@ export const createMyCard = async (req, res) => {
 export const getMyCardList = async (req, res) => {
   try {
     const { sort, genre, sellout, grade, ownerId, pageNum = 1, pageSize = 10, keyword } = req.query;
-    // ownerId = req.user.id;
 
+    // 사용자 ID 확인
+    // if (!req.user?.id) {
+    //   return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
+    // }
+    // console.log('인증된 사용자:', req.user);
+    // console.log('인증된 사용자 id:', req.user.id);
+
+    // const ownerId = req.user.id;
     const prismaSort = sort === 'recent' ? 'createdAt' : sort;
 
     // 서비스 호출
@@ -100,11 +109,9 @@ export const getMyCardList = async (req, res) => {
 };
 
 // enum CardStatus {
-//   CREATED 등록
-//   FOR_SALE 판매중
-//   FOR_TRADING 교환대기중
+//   AVAILABLE 판매중
+//   IN_TRADE 교환대기중
 //   SOLD_OUT 판매완료
-//   ON_TRADING 교환제시중
 // }
 export const getUserSalesCards = async (req, res) => {
   try {
@@ -145,6 +152,11 @@ export const getUserSalesCards = async (req, res) => {
 // 보유한 포토카드 카드 상세 조회
 export const getMyCardById = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('getMyCardById start');
+      console.log('req.params:', req.params);
+    }
+
     const { id } = req.params;
 
     if (!id) {
