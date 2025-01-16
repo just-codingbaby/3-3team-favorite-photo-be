@@ -1,7 +1,7 @@
-import prisma from '../config/prisma.js';
+import prisma from '#config/prisma.js';
+import userService from '#services/userService.js';
 import { faker } from '@faker-js/faker';
 import { Genre, Grade } from '@prisma/client';
-import userService from '../services/userService.js';
 
 async function getFilteredCards(skip, limit) {
   return prisma.card.findMany({

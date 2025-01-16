@@ -1,7 +1,6 @@
-import prisma from '../../../lib/prisma';
+import prisma from '#config/prisma.js';
 
-
-export default async function handler(req, res) {
+async function getHandler(req, res) {
   if (req.method === 'GET') {
     const { userId } = req.query; // 요청에서 userId 추출
     const alarms = await prisma.alarm.findMany({
@@ -14,7 +13,7 @@ export default async function handler(req, res) {
   }
 }
 
-export default async function handler(req, res) {
+async function postHandler(req, res) {
   if (req.method === 'POST') {
     const { userId, message, type } = req.body; // 클라이언트에서 보낸 데이터
 
@@ -32,7 +31,7 @@ export default async function handler(req, res) {
   }
 }
 
-export default async function handler(req, res) {
+async function patchHandler(req, res) {
   if (req.method === 'PATCH') {
     const { notificationId } = req.body;
 
@@ -46,3 +45,5 @@ export default async function handler(req, res) {
     res.status(405).json({ message: 'Method not allowed' });
   }
 }
+
+export { getHandler, postHandler, patchHandler };
