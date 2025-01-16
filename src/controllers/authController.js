@@ -1,7 +1,6 @@
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createUser, findUserByEmail } from '../services/authService.js';
-import bcrypt from 'bcrypt';
-import prisma from '../config/prisma.js';
 import { findUserById } from '../services/userService.js';
 
 export const signUp = async (req, res) => {
@@ -89,7 +88,7 @@ export const login = async (req, res) => {
 
 export const verify = async (req, res) => {
   // #swagger.tags = ['Auth']
-  if (process.env.NODE_ENV == 'development') {
+  if (process.env.NODE_ENV === 'development') {
     console.log('요청 쿠키: ', req.cookies);
   }
   const accessToken = req.cookies.accessToken;

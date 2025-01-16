@@ -1,4 +1,4 @@
-import prisma from '../config/prisma.js';
+import prisma from '#config/prisma.js';
 import jwt from 'jsonwebtoken';
 
 export const checkEmailExists = async (req, res, next) => {
@@ -11,7 +11,9 @@ export const checkEmailExists = async (req, res, next) => {
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
+    if (process.env.NODE_ENV === 'development') {
     console.log('checkEmailExists - 데이터베이스 결과:', user);
+    }
 
     if (!user) {
       console.log('checkEmailExists - 존재하지 않는 이메일:', email);

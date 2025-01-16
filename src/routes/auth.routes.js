@@ -1,8 +1,7 @@
 import express from 'express';
-import { refresh, signUp, verify } from '../controllers/authController.js';
-import { checkDuplicateUser } from '../middlewares/userMiddleware.js';
-import { login, logout } from '../controllers/authController.js';
+import { login, logout, refresh, signUp, verify } from '../controllers/authController.js';
 import { checkEmailExists } from '../middlewares/authMiddleware.js';
+import { checkDuplicateUser } from '../middlewares/userMiddleware.js';
 
 const router = express.Router();
 

@@ -46,7 +46,9 @@ export const createMyCard = async (req, res) => {
     if (!req.user?.id) {
       return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
     }
+    if (process.env.NODE_ENV === 'development') {
     console.log('인증된 사용자:', req.user);
+    }
 
     // 필수 값 검증
     if (!name || !grade || !genre || !price || !quantity) {
@@ -77,7 +79,7 @@ export const getMyCardList = async (req, res) => {
   try {
     const { sort, genre, sellout, grade, ownerId, pageNum = 1, pageSize = 10, keyword } = req.query;
 
-    // // 사용자 ID 확인
+    // 사용자 ID 확인
     // if (!req.user?.id) {
     //   return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
     // }

@@ -1,13 +1,13 @@
 import express from 'express';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
 import {
-  getAllUsers,
-  getProfile,
-  getMyCardList,
-  getMyCardById,
-  getUserSalesCards,
   createMyCard,
+  getAllUsers,
+  getMyCardById,
+  getMyCardList,
+  getProfile,
+  getUserSalesCards,
 } from '../controllers/userController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

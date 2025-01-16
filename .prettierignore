@@ -1,3 +1,18 @@
-# Ignore artifacts:
-build
-coverage
+# Build output
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Generated files
+swagger-output.json
+
+# Config files that should not be formatted
+*.json
+*.yml
+*.yaml
+
+# Other files to ignore
+.cache/
+coverage/

@@ -1,6 +1,6 @@
-import userRepository from '../repositories/userRepository.js';
-import { findUserByEmail } from './authService.js';
-import prisma from '../config/prisma.js';
+import prisma from '#config/prisma.js';
+import userRepository from '#repositories/userRepository.js';
+import { findUserByEmail } from '#services/authService.js';
 
 async function getAllUsers() {
   return userRepository.getAll();

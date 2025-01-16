@@ -3,9 +3,12 @@ import upload from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   try {
+
+    if (process.env.NODE_ENV === 'development') {
     console.log('req.file:', req.file);
+    }
 
     if (!req.file) {
       return res.status(400).json({ message: '파일 업로드 실패. 파일을 확인하세요.' });
