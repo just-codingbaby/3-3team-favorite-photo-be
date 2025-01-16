@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import { config } from '#config/config.js';
 import apiRoutes from '#routes/routes.js';
 import router from './routes/upload.routes.js'; // 업로드 라우터
+import createCardRouter from './routes/createcard.routes.js'; // 통합 라우터
+
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -42,6 +44,9 @@ app.use(`/api/${API_VERSION}`, apiRoutes);
 
 app.use('/uploads', express.static(join(__dirname, 'uploads'))); // 정적 파일 제공
 app.use('/api/v1/images', router);
+
+app.use('/api/v1/users', createCardRouter);
+
 
 app.listen(PORT, () => {
   if (config.env === 'development') {
