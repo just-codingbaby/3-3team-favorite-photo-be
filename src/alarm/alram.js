@@ -1,6 +1,6 @@
-import prisma from '../../../lib/prisma';
+import prisma from '#config/prisma.js';
 
-export default async function handler(req, res) {
+async function getHandler(req, res) {
   if (req.method === 'GET') {
     // 알림 읽기
     const { userId } = req.query;
@@ -35,6 +35,9 @@ export default async function handler(req, res) {
   }
 }
 
+async function postHandler(req, res) {
+  if (req.method === 'POST') {
+    const { userId, message, type } = req.body; // 클라이언트에서 보낸 데이터
 
 import prisma from '../../../lib/prisma';
 
@@ -108,22 +111,30 @@ app.post("/api/claim-points", async (req, res) => {
       },
     });
 
-    // **알림 생성**
-    await prismaClient.alarm.create({
-      data: {
-        user_id: userId,
-        message: `🎉 랜덤포인트를 얻을 시간이에요! ${earnedPoints} 포인트를 획득했습니다!`,
-        type: "reward",
-      },
-    });
-
-    res.json({
-      message: "포인트를 성공적으로 적립했습니다!",
-      earnedPoints,
-      totalPoints: updatedUser.points,
-    });
-  } catch (error) {
-    console.error("포인트 뽑기 실패:", error);
-    res.status(500).json({ message: "서버 에러" });
+    res.status(201).json(alarm); // 생성된 알림 반환
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
-});
+}
+
+  async function patchHandler(req, res) {
+    if (req.method === 'PATCH') {
+      const { notificationId } = req.body;
+
+      const updatedAlarm = await prisma.alarm.update({
+        where: { id: notificationId },
+        data: { is_read: true },
+      });
+
+      res.json({
+        message: "포인트를 성공적으로 적립했습니다!",
+        earnedPoints,
+        totalPoints: updatedUser.points,
+      });
+    } catch (error) {
+      console.error("포인트 뽑기 실패:", error);
+      res.status(500).json({ message: "서버 에러" });
+    }
+  }
+
+  export { getHandler, postHandler, patchHandler };
