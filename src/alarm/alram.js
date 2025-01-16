@@ -1,51 +1,74 @@
 import prisma from '../../../lib/prisma';
 
-
 export default async function handler(req, res) {
   if (req.method === 'GET') {
-    const { userId } = req.query; // 요청에서 userId 추출
-    const alarms = await prisma.alarm.findMany({
-      where: { user_id: Number(userId) },
-      orderBy: { created_at: 'desc' },
-    });
-    res.status(200).json(alarms); // 알림 목록 반환
+    // 알림 읽기
+    const { userId } = req.query;
+    try {
+      const alarms = await prisma.alarm.findMany({
+        where: { user_id: Number(userId) },
+        orderBy: { created_at: 'desc' },
+      });
+      res.status(200).json(alarms);
+    } catch (error) {
+      console.error('Error fetching alarms:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  } else if (req.method === 'POST') {
+    // 알림 생성
+    const { userId, message, type } = req.body;
+    try {
+      const alarm = await prisma.alarm.create({
+        data: {
+          user_id: userId,
+          message,
+          type,
+        },
+      });
+      res.status(201).json(alarm);
+    } catch (error) {
+      console.error('Error creating alarm:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }
 }
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { userId, message, type } = req.body; // 클라이언트에서 보낸 데이터
 
-    const alarm = await prisma.alarm.create({
-      data: {
-        user_id: userId,
-        message,
-        type,
-      },
-    });
-
-    res.status(201).json(alarm); // 생성된 알림 반환
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
-  }
-}
+import prisma from '../../../lib/prisma';
 
 export default async function handler(req, res) {
+  const { id } = req.query;
+
   if (req.method === 'PATCH') {
-    const { notificationId } = req.body;
-
-    const updatedAlarm = await prisma.alarm.update({
-      where: { id: notificationId },
-      data: { is_read: true },
-    });
-
-    res.status(200).json(updatedAlarm);
+    // 알림 수정
+    try {
+      const updatedAlarm = await prisma.alarm.update({
+        where: { id: Number(id) },
+        data: { is_read: true },
+      });
+      res.status(200).json(updatedAlarm);
+    } catch (error) {
+      console.error('Error updating alarm:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  } else if (req.method === 'DELETE') {
+    // 알림 삭제
+    try {
+      await prisma.alarm.delete({
+        where: { id: Number(id) },
+      });
+      res.status(204).end();
+    } catch (error) {
+      console.error('Error deleting alarm:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }
 }
+
 
 app.post("/api/claim-points", async (req, res) => {
   const { userId } = req.body;

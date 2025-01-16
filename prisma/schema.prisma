@@ -17,10 +17,10 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   lastclaimed   Int?
-  notifications Notification[]
-  cards         Card[]
   alarms        Alarm[]
+  cards         Card[]
   exchanges     Exchange[]     @relation("Requester")
+  notifications Notification[]
   purchases     Purchase[]
   shops         Shop[]         @relation("Seller")
 }
@@ -32,49 +32,28 @@ model Notification {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-enum Grade {
-  COMMON
-  RARE
-  SUPER_RARE
-  LEGENDARY
-}
-
-enum Genre {
-  TRAVEL
-  LANDSCAPE
-  PORTRAIT
-  OBJECT
-}
-
-enum CardStatus {
-  AVAILABLE
-  SOLD_OUT
-  IN_TRADE
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Card {
-  id               Int         @id @default(autoincrement())
+  id                Int         @id @default(autoincrement())
   ownerId           Int
-  name             String      @db.VarChar(255)
+  name              String      @db.VarChar(255)
   price             Int
   grade             Grade
   genre             Genre
   description       String?
   totalQuantity     Int
   remainingQuantity Int
-  imgUrl           String      @db.Text
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  status           CardStatus? @default(AVAILABLE)
-  owner            User        @relation(fields: [ownerId], references: [id])
-  purchases        Purchase[]
-  exchangesTarget  Exchange[]  @relation("TargetCard")
-  exchangesOffered Exchange[]  @relation("OfferedCard")
-  shops            Shop[]
+  imgUrl            String
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  status            CardStatus? @default(AVAILABLE)
+  owner             User        @relation(fields: [ownerId], references: [id])
+  exchangesOffered  Exchange[]  @relation("OfferedCard")
+  exchangesTarget   Exchange[]  @relation("TargetCard")
+  purchases         Purchase[]
+  shops             Shop[]
 }
 
 model Purchase {
@@ -118,7 +97,25 @@ model Alarm {
   is_read    Boolean  @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-
   user       User     @relation(fields: [user_id], references: [id])
 }
 
+enum Grade {
+  COMMON
+  RARE
+  SUPER_RARE
+  LEGENDARY
+}
+
+enum Genre {
+  TRAVEL
+  LANDSCAPE
+  PORTRAIT
+  OBJECT
+}
+
+enum CardStatus {
+  AVAILABLE
+  SOLD_OUT
+  IN_TRADE
+}
