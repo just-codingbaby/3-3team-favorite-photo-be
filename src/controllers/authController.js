@@ -30,6 +30,7 @@ export const login = async (req, res) => {
   // #swagger.tags = ['Auth']
   try {
     const { email, password } = req.body;
+    console.log('login-로그인 요청:', email);
 
     if (!email || !password) {
       return res.status(400).json({ message: '모든 필드를 입력해주세요.' });

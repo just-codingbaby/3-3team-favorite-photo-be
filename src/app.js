@@ -6,6 +6,7 @@ import express from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import apiRoutes from './routes/routes.js';
+import router from './routes/upload.routes.js'; // 업로드 라우터
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -38,6 +39,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 const API_VERSION = 'v1';
 app.use(`/api/${API_VERSION}`, apiRoutes);
+
+app.use('/uploads', express.static(join(__dirname, 'uploads'))); // 정적 파일 제공
+app.use('/api/v1/images', router);
 
 app.listen(PORT, () => {
   if (config.env === 'development') {
