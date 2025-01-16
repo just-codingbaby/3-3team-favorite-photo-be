@@ -1,4 +1,4 @@
-import prisma from '../config/prisma.js';
+import prisma from '#config/prisma.js';
 import jwt from 'jsonwebtoken';
 
 export const checkEmailExists = async (req, res, next) => {

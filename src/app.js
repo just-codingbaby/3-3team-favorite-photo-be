@@ -1,16 +1,16 @@
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { config } from './config/config.js';
-import express from 'express';
-import cors from 'cors';
-import swaggerUi from 'swagger-ui-express';
-import apiRoutes from './routes/routes.js';
+import { fileURLToPath } from 'url';
+import { config } from '#config/config.js';
+import apiRoutes from '#routes/routes.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 
 const app = express();
 const PORT = config.port;
-const BASE_URL = config.dbUrl;
+// const BASE_URL = config.dbUrl;
 
 app.use(express.json());
 app.use(cookieParser());

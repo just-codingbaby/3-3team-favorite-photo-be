@@ -1,8 +1,8 @@
+import prisma from '#config/prisma.js';
 import bcrypt from 'bcrypt';
-import prisma from '../config/prisma.js';
 
 export const findUserByEmail = async (email) => {
-  return await prisma.user.findUnique({
+  return prisma.user.findUnique({
     where: { email },
   });
 };
