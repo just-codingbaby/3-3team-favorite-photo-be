@@ -47,7 +47,7 @@ export const createMyCard = async (req, res) => {
       return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
     }
     if (process.env.NODE_ENV === 'development') {
-    console.log('인증된 사용자:', req.user);
+    console.log('createMyCard 인증된 사용자:', req.user);
     }
 
     // 필수 값 검증
@@ -56,7 +56,7 @@ export const createMyCard = async (req, res) => {
     }
 
     // 서비스 호출
-    const newCard = await userService.createMyCard({
+    const newCard = await userService.createCardService({
       name,
       description,
       image,
