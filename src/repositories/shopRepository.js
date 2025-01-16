@@ -3,34 +3,56 @@ import { faker } from '@faker-js/faker';
 import { Genre, Grade } from '@prisma/client';
 import userService from '../services/userService.js';
 
-async function getAll() {
-  const [total, cards] = await Promise.all([
-    prisma.card.count(),
-    prisma.card.findMany({
-      take: 6,
-      skip: 0,
-      AND: {
-        where: {
-          grade: {
-            equal: 'value',
-          },
-          // genre, status..
-        },
-        orderBy: {
-          createdAt: 'desc',
-          // price: 'asc' | 'desc'
+async function getFilteredCards(skip, limit) {
+  return prisma.card.findMany({
+    skip,
+    take: limit,
+    include: {
+      owner: {
+        select: {
+          nickName: true,
         },
       },
-      include: {
-        owner: {
-          select: {
-            nickName: true,
-          },
-        },
-      },
-    }),
-  ]);
-  return { total, cards };
+    },
+  });
+
+  // const [total, cards] = await Promise.all([
+  //   prisma.card.count(),
+  //   prisma.card.findMany({
+  //     include: {
+  //       owner: {
+  //         select: {
+  //           nickName: true,
+  //         },
+  //       },
+  //     },
+  //   }),
+  // ]);
+  // return { total, cards };
+  // const cards = await prisma.card.findMany({
+  //   take: limit + 1,
+  //   cursor: cursor ? { id: cursor } : undefined,
+  //   include: {
+  //     owner: {
+  //       select: {
+  //         nickName: true,
+  //       },
+  //     },
+  //   },
+  // });
+  //
+  // const count = await prisma.card.count();
+  //
+  // let nextCursor = undefined;
+  // if (count > limit) {
+  //   const nextItem = cards.pop();
+  //   nextCursor = nextItem.id;
+  // }
+  // return {
+  //   cards,
+  //   nextCursor,
+  //   hasNextPage: count > limit,
+  // };
 }
 
 async function create() {
@@ -54,7 +76,7 @@ async function create() {
 
   const mockData = {
     ownerId: randomUser.id,
-    name: faker.commerce.productName(),
+    name: faker.book.title,
     price: faker.number.int({ min: 1, max: 10 }),
     grade: faker.helpers.enumValue(Grade),
     genre: randomGenre,
@@ -70,6 +92,6 @@ async function create() {
 }
 
 export default {
-  getAll,
+  getFilteredCards,
   create,
 };
