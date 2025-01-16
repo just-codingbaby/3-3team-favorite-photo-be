@@ -1,7 +1,7 @@
 import express from 'express';
 import shopController from '../controllers/shopController.js';
-import userRoutes from './user.routes.js';
 import authRouter from './auth.routes.js';
+import userRoutes from './user.routes.js';
 
 const router = express.Router();
 
