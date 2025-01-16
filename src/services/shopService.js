@@ -1,7 +1,7 @@
 import shopRepository from '../repositories/shopRepository.js';
 
-async function getAllCards() {
-  return shopRepository.getAll();
+async function getCardList(skip, limit) {
+  return shopRepository.getFilteredCards(skip, limit);
 }
 
 async function createCard() {
@@ -9,6 +9,6 @@ async function createCard() {
 }
 
 export default {
-  getAllCards,
+  getCardList,
   createCard,
 };
