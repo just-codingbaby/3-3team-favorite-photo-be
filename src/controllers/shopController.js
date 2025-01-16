@@ -13,7 +13,10 @@ shopController.get('/', async (req, res) => {
     const cards = await shopService.getCardList(skip, limit);
     res.json(cards);
   } catch (e) {
-    res.status(500).json({ message: 'Error fetching cards', e });
+    console.error('카드 목록 조회 중 오류 발생:', e);
+    res
+      .status(500)
+      .json({ message: '카드 목록을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' });
   }
 });
 
