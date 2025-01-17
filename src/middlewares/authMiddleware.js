@@ -24,17 +24,12 @@ export const checkEmailExists = async (req, res, next) => {
 };
 
 export const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  // console.log('Authorization Header:', authHeader);
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: '인증 토큰이 필요합니다.' });
-  }
-
-  // console.log('JWT_SECRET:', process.env.JWT_SECRET);
-
-  const token = authHeader.split(' ')[1];
+  const token = req.cookies.accessToken;
   // console.log('Token Received:', token); // 받은 토큰 출력
+  if (!token) {
+    return res.status(401).send("인증이 필요합니다.");
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
