@@ -62,14 +62,16 @@ export const login = async (req, res) => {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path: '/',
       maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 쿠키 유효 기간 7일
     });
 
