@@ -81,5 +81,3 @@ jspm_packages/
 .yarn/install-state.gz
 .pnp.*
 
-# Upload file storage
-uploads/

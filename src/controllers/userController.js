@@ -22,9 +22,8 @@ userController.post('/', async (req, res) => {
 
 export const getProfile = async (req, res) => {
   //  #swagger.tags = ['Users']
-  const { email } = req.params;
-  console.log('Requested email:', email);
-
+  const { email } = req.params;  
+  
   try {
     if (!email) {
       return res.status(400).json({ message: '이메일이 제공되지 않았습니다' });

@@ -3,18 +3,14 @@ import jwt from 'jsonwebtoken';
 
 export const checkEmailExists = async (req, res, next) => {
   const { email } = req.body;
-  console.log('checkEmailExists - 요청 email:', email);
-
+  
   if (!email) {
     return res.status(400).json({ message: '이메일이 제공되지 않았습니다.' });
   }
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (process.env.NODE_ENV === 'development') {
-    console.log('checkEmailExists - 데이터베이스 결과:', user);
-    }
-
+  
     if (!user) {
       console.log('checkEmailExists - 존재하지 않는 이메일:', email);
       return res.status(404).json({ message: '존재하지 않는 이메일입니다.' });
