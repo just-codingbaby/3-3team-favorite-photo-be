@@ -6,7 +6,7 @@ const shopController = express.Router();
 shopController.get('/', async (req, res) => {
   // #swagger.tags = ['Shop']
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 4;
+  const limit = parseInt(req.query.limit) || 30;
   const skip = (page - 1) * limit;
 
   try {
