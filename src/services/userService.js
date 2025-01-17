@@ -61,31 +61,33 @@ async function getProfile(email) {
   return user;
 }
 
-async function createMyCard({ name, description, image, grade, genre, price, quantity, ownerId }) {
+async function createCardService({ name, description, image, grade, genre, price, quantity, ownerId }) {
   try {
     if (!ownerId) {
       throw new Error('ownerId가 제공되지 않았습니다.');
     }
+
     const newCard = await prisma.card.create({
       data: {
         name,
         description,
-        imgUrl: image,
+        imgUrl: image, // 업로드된 이미지 경로 저장
         grade,
         genre,
         price,
         totalQuantity: quantity,
         remainingQuantity: quantity,
-        ownerId,
+        ownerId, // 생성한 사용자 ID
       },
     });
 
     return newCard;
   } catch (error) {
-    console.error('나의 카드 생성 실패 (서비스 계층):', error.message);
-    throw new Error('나의 카드 생성 실패');
+    console.error('포토카드 생성 실패 (서비스 계층):', error.message);
+    throw new Error('포토카드 생성 실패');
   }
 }
+
 
 // keyword: 카드 이름에서 특정 키워드가 포함된 항목만 필터링.
 // sellout: 매진 여부를 필터링. true인 경우 남은 수량(remainingQuantity)이 0인 카드만 조회
@@ -157,8 +159,12 @@ async function getMyCardById({ id }) {
         name: true,
         genre: true,
         grade: true,
+        description: true,
         remainingQuantity: true,
         ownerId: true,
+        price: true,
+        totalQuantity: true,
+        imgUrl: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -191,7 +197,7 @@ export const getUserSalesCards = async ({
         grade: grade || undefined,
         name: keyword ? { contains: keyword } : undefined,
         remainingQuantity: sellout === 'true' ? 0 : undefined,
-        cardStatus: cardStatus || undefined,
+        status: cardStatus || undefined,
       },
       orderBy: sort ? { [sort]: 'desc' } : undefined,
       skip: (pageNum - 1) * pageSize,
@@ -206,7 +212,7 @@ export const getUserSalesCards = async ({
         grade: grade || undefined,
         name: keyword ? { contains: keyword } : undefined,
         remainingQuantity: sellout === 'true' ? 0 : undefined,
-        cardStatus: cardStatus || undefined,
+        status: cardStatus || undefined,
       },
     });
 
@@ -219,7 +225,7 @@ export const getUserSalesCards = async ({
         grade: grade || undefined,
         name: keyword ? { contains: keyword } : undefined,
         remainingQuantity: sellout === 'true' ? 0 : undefined,
-        cardStatus: cardStatus || undefined,
+        status: cardStatus || undefined,
       },
       _count: {
         grade: true,
@@ -248,6 +254,6 @@ export default {
   findAllUsers,
   getMyCardList,
   getMyCardById,
-  getUserSalesCards,
-  createMyCard,
+  getUserSalesCards,  
+  createCardService,
 };
