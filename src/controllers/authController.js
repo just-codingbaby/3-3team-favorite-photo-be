@@ -62,14 +62,16 @@ export const login = async (req, res) => {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path: '/',
       maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 쿠키 유효 기간 7일
     });
 
@@ -112,8 +114,8 @@ export const logout = (req, res) => {
   // #swagger.tags = ['Auth']
   try {
     // 쿠키 삭제
-    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'None', path:'/' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'None', path:'/' });
 
     // 로그아웃 완료 응답
     return res.status(200).json({ message: '로그아웃 성공' });
@@ -139,7 +141,8 @@ export const refresh = async (req, res) => {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path:'/',
       maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
     });
 
