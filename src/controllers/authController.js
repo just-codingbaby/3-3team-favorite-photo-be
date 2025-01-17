@@ -114,8 +114,8 @@ export const logout = (req, res) => {
   // #swagger.tags = ['Auth']
   try {
     // 쿠키 삭제
-    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'None', path:'/' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'None', path:'/' });
 
     // 로그아웃 완료 응답
     return res.status(200).json({ message: '로그아웃 성공' });
