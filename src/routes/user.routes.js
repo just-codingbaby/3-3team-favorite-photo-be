@@ -12,7 +12,7 @@ import { authMiddleware } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 // 나의 포토 카드 생성
-router.post('/my-cards', authMiddleware, createMyCard);
+// router.post('/my-cards', authMiddleware, createMyCard);
 
 // 사용자 전체 목록 조회 및 사용자 생성
 router.get('/', getAllUsers);
