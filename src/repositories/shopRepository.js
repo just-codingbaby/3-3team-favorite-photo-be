@@ -76,7 +76,7 @@ async function create() {
 
   const mockData = {
     ownerId: randomUser.id,
-    name: faker.book.title,
+    name: faker.book.title(),
     price: faker.number.int({ min: 1, max: 10 }),
     grade: faker.helpers.enumValue(Grade),
     genre: randomGenre,
