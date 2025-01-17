@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="" rel="noopener">
- <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
+  <a href="https://3-3team-favorite-photo-fe.vercel.app" rel="noopener">
+ <img width=330.82px height=60px src="./public/logo.webp" alt="최애의포토 로고"></a>
 </p>
 
 <h3 align="center">3-3team-favorite-photo-be</h3>
