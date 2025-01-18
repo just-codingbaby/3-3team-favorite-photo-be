@@ -30,12 +30,17 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 };
-
-if (process.env.NODE_ENV === 'development') {
-  console.log('CORS Origins:', corsOptions.origin);
-}
-
 app.use(cors(corsOptions));
+console.log('CORS Origins:', corsOptions.origin);
+
+// if (process.env.NODE_ENV === 'development') {
+//   // **디버깅 코드 추가 (요청 헤더와 쿠키 출력)**
+//   app.use((req, res, next) => {
+//     console.log('요청 헤더:', req.headers);
+//     console.log('요청 쿠키:', req.cookies);
+//     next();
+//   });
+// }
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -46,10 +51,7 @@ if (!existsSync(uploadPath)) {
   mkdirSync(uploadPath);
 }
 app.use('/uploads', express.static(uploadPath)); // 정적 파일 제공
-
-if (process.env.NODE_ENV === 'development') {
-  console.log('Static file directory:', uploadPath);
-}
+console.log('Static file directory:', uploadPath);
 
 let swaggerFile;
 try {
