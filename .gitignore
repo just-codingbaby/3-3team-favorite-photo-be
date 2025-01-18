@@ -81,3 +81,5 @@ jspm_packages/
 .yarn/install-state.gz
 .pnp.*
 
+# My Development Notes (Mostly Comments)
+authControllerNote.md
