@@ -1,5 +1,6 @@
 import express from 'express';
 import userService from '../services/userService.js';
+import sortMapping from '#utils/sortMapping.js';
 
 const userController = express.Router();
 
@@ -76,7 +77,7 @@ export const createMyCard = async (req, res) => {
 // 나의 카드 목록 조회
 export const getMyCardList = async (req, res) => {
   try {
-    const { sort, genre, sellout, grade, ownerId, pageNum = 1, pageSize = 10, keyword } = req.query;
+    const { sort, genre, grade, ownerId, pageNum = 1, pageSize = 10, keyword } = req.query;
 
     // 사용자 ID 확인
     // if (!req.user?.id) {
@@ -86,13 +87,21 @@ export const getMyCardList = async (req, res) => {
     // console.log('인증된 사용자 id:', req.user.id);
 
     // const ownerId = req.user.id;
-    const prismaSort = sort === 'recent' ? 'createdAt' : sort;
+
+    if (!ownerId) {
+      return res.status(400).json({ message: "ownerId가 필요합니다." });
+    }
+
+    // 정렬 값 검증
+    const prismaSort = sortMapping[sort];
+    if (!prismaSort) {
+      console.warn(`Invalid sort value: ${sort}. Defaulting to "recent".`);
+    }
 
     // 서비스 호출
     const result = await userService.getMyCardList({
-      sort: prismaSort,
-      genre,
-      sellout,
+      sort: prismaSort || 'recent', // 검증된 정렬 값 또는 기본값
+      genre,      
       grade,
       ownerId,
       pageNum,
@@ -107,11 +116,6 @@ export const getMyCardList = async (req, res) => {
   }
 };
 
-// enum CardStatus {
-//   AVAILABLE 판매중
-//   IN_TRADE 교환대기중
-//   SOLD_OUT 판매완료
-// }
 export const getUserSalesCards = async (req, res) => {
   try {
     const {
@@ -126,7 +130,15 @@ export const getUserSalesCards = async (req, res) => {
       cardStatus,
     } = req.query;
 
-    const prismaSort = sort === 'recent' ? 'createdAt' : sort;
+    if (!ownerId) {
+      return res.status(400).json({ message: "ownerId가 필요합니다." });
+    }
+
+    // 정렬 값 검증
+    const prismaSort = sortMapping[sort];
+    if (!prismaSort) {
+      console.warn(`Invalid sort value: ${sort}. Defaulting to "recent".`);
+    }
 
     // 서비스 호출
     const result = await userService.getUserSalesCards({
