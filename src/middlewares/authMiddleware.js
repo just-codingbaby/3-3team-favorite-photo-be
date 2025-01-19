@@ -3,18 +3,14 @@ import jwt from 'jsonwebtoken';
 
 export const checkEmailExists = async (req, res, next) => {
   const { email } = req.body;
-  console.log('checkEmailExists - 요청 email:', email);
-
+  
   if (!email) {
     return res.status(400).json({ message: '이메일이 제공되지 않았습니다.' });
   }
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (process.env.NODE_ENV === 'development') {
-    console.log('checkEmailExists - 데이터베이스 결과:', user);
-    }
-
+  
     if (!user) {
       console.log('checkEmailExists - 존재하지 않는 이메일:', email);
       return res.status(404).json({ message: '존재하지 않는 이메일입니다.' });
@@ -28,17 +24,12 @@ export const checkEmailExists = async (req, res, next) => {
 };
 
 export const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  // console.log('Authorization Header:', authHeader);
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: '인증 토큰이 필요합니다.' });
-  }
-
-  // console.log('JWT_SECRET:', process.env.JWT_SECRET);
-
-  const token = authHeader.split(' ')[1];
+  const token = req.cookies.accessToken;
   // console.log('Token Received:', token); // 받은 토큰 출력
+  if (!token) {
+    return res.status(401).send("인증이 필요합니다.");
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

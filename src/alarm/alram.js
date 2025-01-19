@@ -1,49 +1,117 @@
 import prisma from '#config/prisma.js';
+import express from "express";
 
-async function getHandler(req, res) {
-  if (req.method === 'GET') {
-    const { userId } = req.query; // 요청에서 userId 추출
+const app = express();
+app.use(express.json());
+
+// GET: 알림 목록 가져오기
+app.get("/api/notifications", async (req, res) => {
+  const { userId } = req.query;
+  try {
     const alarms = await prisma.alarm.findMany({
       where: { user_id: Number(userId) },
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
     });
-    res.status(200).json(alarms); // 알림 목록 반환
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
+    res.status(200).json(alarms);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+});
 
-async function postHandler(req, res) {
-  if (req.method === 'POST') {
-    const { userId, message, type } = req.body; // 클라이언트에서 보낸 데이터
-
+// POST: 알림 생성
+app.post("/api/alarms", async (req, res) => {
+  const { userId, message, type } = req.body;
+  try {
     const alarm = await prisma.alarm.create({
       data: {
         user_id: userId,
         message,
         type,
+        is_read: false,
+      },
+    });
+    res.status(201).json(alarm);
+  } catch (error) {
+    console.error("Error creating alarm:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// PATCH: 알림 읽음 처리
+app.patch("/api/alarms/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedAlarm = await prisma.alarm.update({
+      where: { id: Number(id) },
+      data: { is_read: true },
+    });
+    res.status(200).json({
+      message: "알림이 읽음 처리되었습니다.",
+      updatedAlarm,
+    });
+  } catch (error) {
+    console.error("Error updating alarm:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// DELETE: 알림 삭제
+app.delete("/api/alarms/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.alarm.delete({
+      where: { id: Number(id) },
+    });
+    res.status(204).end();
+  } catch (error) {
+    console.error("Error deleting alarm:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// POST: 랜덤 포인트 생성
+app.post("/api/claim-points", async (req, res) => {
+  const { userId } = req.body;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) return res.status(404).json({ message: "유저를 찾을 수 없습니다." });
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    const oneHour = 3600;
+
+    if (user.lastClaimed && currentTime - user.lastClaimed < oneHour) {
+      const remainingTime = oneHour - (currentTime - user.lastClaimed);
+      return res.status(403).json({ message: "아직 뽑을 수 없습니다.", remainingTime });
+    }
+
+    const randomPoints = [500, 1000, 1500];
+    const earnedPoints = randomPoints[Math.floor(Math.random() * randomPoints.length)];
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: (user.points || 0) + earnedPoints,
+        lastClaimed: currentTime,
       },
     });
 
-    res.status(201).json(alarm); // 생성된 알림 반환
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
-  }
-}
-
-async function patchHandler(req, res) {
-  if (req.method === 'PATCH') {
-    const { notificationId } = req.body;
-
-    const updatedAlarm = await prisma.alarm.update({
-      where: { id: notificationId },
-      data: { is_read: true },
+    const alarm = await prisma.alarm.create({
+      data: {
+        user_id: userId,
+        message: `랜덤 포인트 ${earnedPoints}점을 획득했습니다!`,
+        type: "reward",
+        is_read: false,
+      },
     });
 
-    res.status(200).json(updatedAlarm);
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
+    res.status(201).json({ message: "포인트를 성공적으로 적립했습니다!", earnedPoints, totalPoints: updatedUser.points, alarm });
+  } catch (error) {
+    console.error("포인트 뽑기 실패:", error);
+    res.status(500).json({ message: "서버 에러" });
   }
-}
+});
 
-export { getHandler, postHandler, patchHandler };
+export default app;

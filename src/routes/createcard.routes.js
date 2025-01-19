@@ -12,8 +12,8 @@ createCardRouter.post('/my-cards', authMiddleware, upload.single('file'), async 
     if (!req.file) {
       return res.status(400).json({ message: '파일 업로드 실패. 파일을 확인하세요.' });
     }
-
-    const imageUrl = `/uploads/${req.file.filename}`; // 업로드된 파일 경로
+    
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`; // 업로드된 파일 경로. 절대 경로 생성
     const { name, description, grade, genre, price, quantity } = JSON.parse(req.body.data || '{}');
 
     // 사용자 인증 확인

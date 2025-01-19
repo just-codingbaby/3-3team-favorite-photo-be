@@ -197,7 +197,7 @@ export const getUserSalesCards = async ({
         grade: grade || undefined,
         name: keyword ? { contains: keyword } : undefined,
         remainingQuantity: sellout === 'true' ? 0 : undefined,
-        cardStatus: cardStatus || undefined,
+        status: cardStatus || undefined,
       },
       orderBy: sort ? { [sort]: 'desc' } : undefined,
       skip: (pageNum - 1) * pageSize,
@@ -212,7 +212,7 @@ export const getUserSalesCards = async ({
         grade: grade || undefined,
         name: keyword ? { contains: keyword } : undefined,
         remainingQuantity: sellout === 'true' ? 0 : undefined,
-        cardStatus: cardStatus || undefined,
+        status: cardStatus || undefined,
       },
     });
 
@@ -225,7 +225,7 @@ export const getUserSalesCards = async ({
         grade: grade || undefined,
         name: keyword ? { contains: keyword } : undefined,
         remainingQuantity: sellout === 'true' ? 0 : undefined,
-        cardStatus: cardStatus || undefined,
+        status: cardStatus || undefined,
       },
       _count: {
         grade: true,

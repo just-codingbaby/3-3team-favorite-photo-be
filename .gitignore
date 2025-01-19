@@ -81,5 +81,5 @@ jspm_packages/
 .yarn/install-state.gz
 .pnp.*
 
-# Upload file storage
-uploads/
+# My Development Notes (Mostly Comments)
+authControllerNote.md

@@ -16,6 +16,8 @@ model User {
   points        Int?           @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  lastclaimed   Int?
+  alarms        Alarm[]
   cards         Card[]
   exchanges     Exchange[]     @relation("Requester")
   notifications Notification[]
@@ -87,6 +89,17 @@ model Shop {
   seller    User     @relation("Seller", fields: [sellerId], references: [id])
 }
 
+model Alarm {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  message    String
+  type       String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
 enum Grade {
   COMMON
   RARE
@@ -105,4 +118,13 @@ enum CardStatus {
   AVAILABLE
   SOLD_OUT
   IN_TRADE
+}
+
+enum AlarmType {
+  PHOTO_CARD_EXCHANGE_SUCCESS
+  PHOTO_CARD_EXCHANGE_OFFER
+  PHOTO_CARD_PURCHASE_COMPLETE
+  PHOTO_CARD_SALE_SUCCESS
+  PHOTO_CARD_OUT_OF_STOCK
+  REWARD
 }

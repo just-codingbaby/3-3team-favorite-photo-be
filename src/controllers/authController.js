@@ -28,8 +28,7 @@ export const signUp = async (req, res) => {
 export const login = async (req, res) => {
   // #swagger.tags = ['Auth']
   try {
-    const { email, password } = req.body;
-    console.log('login-로그인 요청:', email);
+    const { email, password } = req.body;    
 
     if (!email || !password) {
       return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
@@ -40,8 +39,7 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: '존재하지 않는 이메일입니다.' });
     }
-    console.log('User:', user);
-
+    
     // 비밀번호 검증 (비밀번호 암호화 사용 시, bcrypt를 사용하여 비교해야 함)
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -64,14 +62,16 @@ export const login = async (req, res) => {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path: '/',
       maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 쿠키 유효 기간 7일
     });
 
@@ -114,8 +114,8 @@ export const logout = (req, res) => {
   // #swagger.tags = ['Auth']
   try {
     // 쿠키 삭제
-    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'None', path:'/' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'None', path:'/' });
 
     // 로그아웃 완료 응답
     return res.status(200).json({ message: '로그아웃 성공' });
@@ -141,7 +141,8 @@ export const refresh = async (req, res) => {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'None',
+      path:'/',
       maxAge: 60 * 60 * 1000, // 쿠키 유효 기간 1시간
     });
 

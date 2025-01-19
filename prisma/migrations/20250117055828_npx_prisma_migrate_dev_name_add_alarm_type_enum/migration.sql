@@ -1,0 +1,21 @@
+-- CreateEnum
+CREATE TYPE "AlarmType" AS ENUM ('PHOTO_CARD_EXCHANGE_SUCCESS', 'PHOTO_CARD_EXCHANGE_OFFER', 'PHOTO_CARD_PURCHASE_COMPLETE', 'PHOTO_CARD_SALE_SUCCESS', 'PHOTO_CARD_OUT_OF_STOCK', 'REWARD');
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "lastclaimed" INTEGER;
+
+-- CreateTable
+CREATE TABLE "Alarm" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "message" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "is_read" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Alarm_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "Alarm" ADD CONSTRAINT "Alarm_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
