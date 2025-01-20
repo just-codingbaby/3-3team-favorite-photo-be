@@ -59,7 +59,7 @@ export const login = async (req, res) => {
       { expiresIn: '7d' },
     );
 
-    /*
+    
     // 로컬 환경에서 쿠키 설정
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -76,7 +76,6 @@ export const login = async (req, res) => {
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 쿠키 유효 기간 7일
     });
-*/
 
     // 배포 환경에서의 쿠키 설정
     res.cookie('accessToken', accessToken, {
