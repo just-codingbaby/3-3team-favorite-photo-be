@@ -11,6 +11,10 @@ shopController.get('/', async (req, res) => {
   const keyword = req.query.keyword?.trim() || '';
   const filterName = req.query.filterName?.trim() || '';
   const filterValue = req.query.filterValue?.trim() || '';
+  const validFilterNames = ['status', 'genre', 'grade'];
+  if (filterName && !validFilterNames.includes(filterName)) {
+    return res.status(400).json({ message: '유효하지 않은 필터 이름입니다.' });
+  }
   const sortField = req.query.sortField || 'createdAt';
   const sortOrder = req.query.sortOrder || 'desc';
   const validSortFields = ['createdAt', 'price'];
