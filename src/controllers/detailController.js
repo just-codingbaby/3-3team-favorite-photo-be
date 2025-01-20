@@ -131,4 +131,12 @@ detail.post('/exchange/list', async (req, res) => {
     res.status(500).send('서버 오류로 요청을 처리할 수 없습니다.');
   }
 });
+
+detail.delete('/delete/:id', async (req, res) => {
+  try {
+    const { id } = req.params; // exchnage id
+  } catch (e) {
+    console.error(e);
+  }
+});
 export default detail;
