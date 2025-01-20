@@ -56,6 +56,93 @@ detail.get('/mycard/:id', async (req, res) => {
     console.error('error', e);
   }
 });
+
+detail.post('/purchase', async (req, res) => {
+  const { userId, cardId, quantity } = req.body;
+  try {
+    // 구매자 조회
+    const purchaseUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!purchaseUser) {
+      return res.status(404).send('사용자를 찾을 수 없습니다.');
+    }
+
+    // 구매대상 카드 조회
+    const card = await prisma.card.findUnique({
+      where: { id: cardId },
+    });
+    if (!card) {
+      return res.status(404).send('카드를 찾을 수 없습니다.');
+    }
+
+    if (card.remainingQuantity < quantity) {
+      return res.status(400).send('구매할 수량이 부족합니다.');
+    }
+
+    // 판매자의 보유 카드 수량 감소
+    await prisma.card.update({
+      where: { id: cardId },
+      data: {
+        remainingQuantity: card.remainingQuantity - quantity,
+      },
+    });
+
+    // 판매자 포인트 증가
+    const seller = await prisma.user.findUnique({
+      where: { id: Number(card.ownerId) },
+    });
+
+    await prisma.user.update({
+      where: { id: Number(seller.id) },
+      data: {
+        points: seller.points + card.price * quantity,
+      },
+    });
+
+    // 구매자에게 카드 추가
+    await prisma.card.create({
+      data: {
+        ownerId: Number(purchaseUser.id),
+        name: card.name,
+        price: card.price,
+        grade: card.grade,
+        genre: card.genre,
+        description: card.description,
+        totalQuantity: quantity,
+        remainingQuantity: quantity,
+        imgUrl: card.imgUrl,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: card.status,
+        creatorId: Number(purchaseUser.id),
+        tradeStatus: card.tradeStatus,
+      },
+    });
+
+    // 구매자 포인트 차감
+    await prisma.user.update({
+      where: { id: Number(purchaseUser.id) },
+      data: {
+        points: purchaseUser.points - card.price * quantity,
+      },
+    });
+
+    // 구매 기록 생성
+    await prisma.purchase.create({
+      data: {
+        buyerId: Number(purchaseUser.id),
+        cardId: cardId,
+      },
+    });
+
+    res.status(201).send(true);
+  } catch (e) {
+    console.error('카드 구매 에러:', e);
+    res.status(500).send('서버 오류로 요청을 처리할 수 없습니다.');
+  }
+});
+
 detail.post('/exchange', async (req, res) => {
   const { requesterId, targetCardId, offeredCardId } = req.body;
 
