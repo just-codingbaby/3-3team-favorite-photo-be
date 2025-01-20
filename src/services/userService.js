@@ -124,6 +124,12 @@ async function getMyCardList({ sort, genre, grade, ownerId, pageNum, pageSize, k
     const cards = await prisma.card.findMany({
       where: filters,
       include: {
+        creator: {
+          select: {
+            id: true,
+            nickName: true,
+          },
+        },
         shops: {
           select: {
             id: true,
@@ -142,6 +148,10 @@ async function getMyCardList({ sort, genre, grade, ownerId, pageNum, pageSize, k
     const counts = await getGradeCounts(ownerId, genre, grade);
 
     return { data: { cards, totalCount, countsGroupByGrade: counts } };
+
+    // const result = { data: { cards, totalCount } };
+    // console.log('API 응답 데이터 (서비스 계층):', result);
+    // return result;
   } catch (error) {
     console.error('MyGallery 카드 조회 실패:', error.message);
     throw new Error(`카드 데이터 처리 실패: ${error.message}`);
@@ -239,7 +249,14 @@ export const getUserSalesCards = async ({
     // 카드 데이터 가져오기
     const cards = await prisma.card.findMany({
       where: filters,
-      include: {}, // creator 제거
+      include: {
+        creator: {
+          select: {
+            id: true,
+            nickName: true,
+          },
+        },
+      },
       orderBy,
       skip: (pageNum - 1) * pageSize,
       take: parseInt(pageSize, 10),
