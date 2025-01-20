@@ -12,10 +12,10 @@ app.get("/api/notifications", async (req, res) => {
       where: { user_id: Number(userId) },
       orderBy: { created_at: "desc" },
     });
-    res.status(200).json(alarms);
+    res.status(200).json({ success: true, data: alarms });
   } catch (error) {
     console.error("Error fetching notifications:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "알림을 불러오는 데 실패했습니다." });
   }
 });
 
@@ -73,18 +73,25 @@ app.delete("/api/alarms/:id", async (req, res) => {
 // POST: 랜덤 포인트 생성
 app.post("/api/claim-points", async (req, res) => {
   const { userId } = req.body;
+
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
-    if (!user) return res.status(404).json({ message: "유저를 찾을 수 없습니다." });
+
+    if (!user) {
+      return res.status(404).json({ message: "유저를 찾을 수 없습니다." });
+    }
 
     const currentTime = Math.floor(Date.now() / 1000);
     const oneHour = 3600;
 
     if (user.lastClaimed && currentTime - user.lastClaimed < oneHour) {
       const remainingTime = oneHour - (currentTime - user.lastClaimed);
-      return res.status(403).json({ message: "아직 뽑을 수 없습니다.", remainingTime });
+      return res.status(403).json({
+        message: "아직 뽑을 수 없습니다.",
+        remainingTime,
+      });
     }
 
     const randomPoints = [500, 1000, 1500];
@@ -102,16 +109,53 @@ app.post("/api/claim-points", async (req, res) => {
       data: {
         user_id: userId,
         message: `랜덤 포인트 ${earnedPoints}점을 획득했습니다!`,
-        type: "reward",
+        type: "REWARD",
         is_read: false,
       },
     });
 
-    res.status(201).json({ message: "포인트를 성공적으로 적립했습니다!", earnedPoints, totalPoints: updatedUser.points, alarm });
+    res.status(201).json({
+      message: "포인트를 성공적으로 적립했습니다!",
+      earnedPoints,
+      totalPoints: updatedUser.points,
+      alarm,
+    });
   } catch (error) {
     console.error("포인트 뽑기 실패:", error);
     res.status(500).json({ message: "서버 에러" });
   }
+});
+
+// 알림 관련 포토 카드 작업
+const photoCardNotifications = [
+  { endpoint: "/api/photo-card-exchange-success", message: "포토 카드 교환 제안이 승인되었습니다.", type: "PHOTO_CARD_EXCHANGE_SUCCESS" },
+  { endpoint: "/api/photo-card-exchange-proposal", message: "포토 카드 교환 제안이 왔습니다.", type: "PHOTO_CARD_EXCHANGE_PROPOSAL" },
+  { endpoint: "/api/photo-card-purchase-complete", message: "포토 카드 구매가 완료되었습니다.", type: "PHOTO_CARD_PURCHASE_COMPLETE" },
+  { endpoint: "/api/photo-card-sale-success", message: "포토 카드가 판매되었습니다.", type: "PHOTO_CARD_SALE_SUCCESS" },
+  { endpoint: "/api/photo-card-out-of-stock", message: "판매 중인 포토 카드가 품절되었습니다.", type: "PHOTO_CARD_OUT_OF_STOCK" },
+];
+
+photoCardNotifications.forEach(({ endpoint, message, type }) => {
+  app.post(endpoint, async (req, res) => {
+    const { userId } = req.body;
+    try {
+      const alarm = await prisma.alarm.create({
+        data: {
+          user_id: userId,
+          message,
+          type,
+          is_read: false,
+        },
+      });
+      res.status(201).json({
+        message: `${message} 알림이 생성되었습니다.`,
+        alarm,
+      });
+    } catch (error) {
+      console.error("알림 생성 실패:", error);
+      res.status(500).json({ message: "서버 에러" });
+    }
+  });
 });
 
 export default app;
