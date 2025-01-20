@@ -3,15 +3,40 @@ import userService from '#services/userService.js';
 import { faker } from '@faker-js/faker';
 import { Genre, Grade } from '@prisma/client';
 
-async function getFilteredCards(skip, limit, keyword, sortField, sortOrder) {
+async function getFilteredCards(
+  skip,
+  limit,
+  keyword,
+  filterName,
+  filterValue,
+  sortField,
+  sortOrder,
+) {
+  const filter = [];
+
+  if (filterName && filterValue) {
+    filter.push({
+      [filterName]: {
+        equals: filterValue,
+      },
+    });
+  }
+
+  console.log(filter);
+
   return prisma.card.findMany({
     skip,
     take: limit,
     where: {
-      name: {
-        contains: keyword,
-        mode: 'insensitive',
-      },
+      AND: [
+        {
+          name: {
+            contains: keyword,
+            mode: 'insensitive',
+          },
+        },
+        ...(filter || null),
+      ],
     },
     orderBy: {
       [sortField]: sortOrder,
@@ -34,31 +59,37 @@ async function create() {
   });
 
   let randomUser;
+  let randomCreator;
 
   if (users.length < 1) {
     randomUser = await userService.createUser();
   } else {
     randomUser = faker.helpers.arrayElement(users);
+    randomCreator = faker.helpers.arrayElement(users);
   }
 
   const randomGenre = faker.helpers.enumValue(Genre);
+  const randomGrade = faker.helpers.enumValue(Grade);
   const totalQuantity = faker.number.int({ min: 1, max: 3 });
   const remainingQuantity = faker.number.int({ min: 0, max: totalQuantity });
 
-  const mockData = {
+  const mockCardData = {
     ownerId: randomUser.id,
-    name: faker.book.title(),
+    creatorId: randomCreator.id,
+    name: faker.music.songName(),
     price: faker.number.int({ min: 1, max: 10 }),
-    grade: faker.helpers.enumValue(Grade),
+    grade: randomGrade,
     genre: randomGenre,
     description: faker.commerce.productDescription(),
-    imgUrl: `/images/card/img_default-${randomGenre.toLowerCase()}.webp`,
-    remainingQuantity: remainingQuantity,
     totalQuantity: totalQuantity,
+    remainingQuantity: remainingQuantity,
+    imgUrl: `/images/card/img_default-${randomGenre.toLowerCase()}.webp`,
+    status: 'AVAILABLE',
+    tradeStatus: 'CREATED',
   };
 
   return prisma.card.create({
-    data: mockData,
+    data: mockCardData,
   });
 }
 

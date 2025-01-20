@@ -9,6 +9,8 @@ shopController.get('/', async (req, res) => {
   const limit = parseInt(req.query.limit) || 30;
   const skip = (page - 1) * limit;
   const keyword = req.query.keyword?.trim() || '';
+  const filterName = req.query.filterName?.trim() || '';
+  const filterValue = req.query.filterValue?.trim() || '';
   const sortField = req.query.sortField || 'createdAt';
   const sortOrder = req.query.sortOrder || 'desc';
   const validSortFields = ['createdAt', 'price'];
@@ -21,7 +23,15 @@ shopController.get('/', async (req, res) => {
     return res.status(400).json({ message: '유효하지 않은 정렬 순서입니다.' });
   }
   try {
-    const cards = await shopService.getCardList(skip, limit, keyword, sortField, sortOrder);
+    const cards = await shopService.getCardList(
+      skip,
+      limit,
+      keyword,
+      filterName,
+      filterValue,
+      sortField,
+      sortOrder,
+    );
     res.json(cards);
   } catch (e) {
     console.error('카드 목록 조회 중 오류 발생:', e);
