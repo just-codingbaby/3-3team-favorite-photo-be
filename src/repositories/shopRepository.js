@@ -3,10 +3,13 @@ import userService from '#services/userService.js';
 import { faker } from '@faker-js/faker';
 import { Genre, Grade } from '@prisma/client';
 
-async function getFilteredCards(skip, limit) {
+async function getFilteredCards(skip, limit, sortField, sortOrder) {
   return prisma.card.findMany({
     skip,
     take: limit,
+    orderBy: {
+      [sortField]: sortOrder,
+    },
     include: {
       owner: {
         select: {
@@ -15,44 +18,6 @@ async function getFilteredCards(skip, limit) {
       },
     },
   });
-
-  // const [total, cards] = await Promise.all([
-  //   prisma.card.count(),
-  //   prisma.card.findMany({
-  //     include: {
-  //       owner: {
-  //         select: {
-  //           nickName: true,
-  //         },
-  //       },
-  //     },
-  //   }),
-  // ]);
-  // return { total, cards };
-  // const cards = await prisma.card.findMany({
-  //   take: limit + 1,
-  //   cursor: cursor ? { id: cursor } : undefined,
-  //   include: {
-  //     owner: {
-  //       select: {
-  //         nickName: true,
-  //       },
-  //     },
-  //   },
-  // });
-  //
-  // const count = await prisma.card.count();
-  //
-  // let nextCursor = undefined;
-  // if (count > limit) {
-  //   const nextItem = cards.pop();
-  //   nextCursor = nextItem.id;
-  // }
-  // return {
-  //   cards,
-  //   nextCursor,
-  //   hasNextPage: count > limit,
-  // };
 }
 
 async function create() {

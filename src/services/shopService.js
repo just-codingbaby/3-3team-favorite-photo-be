@@ -1,7 +1,7 @@
 import shopRepository from '../repositories/shopRepository.js';
 
-async function getCardList(skip, limit) {
-  return shopRepository.getFilteredCards(skip, limit);
+async function getCardList(skip, limit, sortField, sortOrder) {
+  return shopRepository.getFilteredCards(skip, limit, sortField, sortOrder);
 }
 
 async function createCard() {
