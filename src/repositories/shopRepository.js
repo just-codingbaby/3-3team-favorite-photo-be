@@ -13,7 +13,6 @@ async function getFilteredCards(
   sortOrder,
 ) {
   const filter = [];
-
   if (filterName && filterValue) {
     filter.push({
       [filterName]: {
@@ -21,9 +20,7 @@ async function getFilteredCards(
       },
     });
   }
-
-  console.log(filter);
-
+  // console.log(filter);
   return prisma.card.findMany({
     skip,
     take: limit,

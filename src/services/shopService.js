@@ -33,14 +33,14 @@ async function getCardList(skip, limit, keyword, filterName, filterValue, sortFi
     convertStrToEnum = CardGradeFilterEnum[filterValue];
   }
 
-  // console.log(covertStrToEnum);
+  // console.log(convertStrToEnum);
 
   return shopRepository.getFilteredCards(
     skip,
     limit,
     keyword,
     filterName,
-    covertStrToEnum,
+    convertStrToEnum,
     sortField,
     sortOrder,
   );
