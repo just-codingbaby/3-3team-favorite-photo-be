@@ -1,9 +1,9 @@
 import prisma from '#config/prisma.js';
+import { getBasicFilters, getMyCardFilters } from '#helpers/cardFilters.js';
+import { getGradeCounts } from '#helpers/getGradeCounts.js';
 import userRepository from '#repositories/userRepository.js';
 import { findUserByEmail } from '#services/authService.js';
-import { getMyCardFilters, getBasicFilters } from '#helpers/cardFilters.js';
 import sortMapping from '#utils/sortMapping.js';
-import { getGradeCounts }  from "#helpers/getGradeCounts.js";
 
 async function getAllUsers() {
   return userRepository.getAll();
@@ -64,7 +64,16 @@ async function getProfile(email) {
   return user;
 }
 
-async function createCardService({ name, description, image, grade, genre, price, quantity, ownerId }) {
+async function createCardService({
+  name,
+  description,
+  image,
+  grade,
+  genre,
+  price,
+  quantity,
+  ownerId,
+}) {
   try {
     if (!ownerId) {
       throw new Error('ownerId가 제공되지 않았습니다.');
@@ -80,9 +89,8 @@ async function createCardService({ name, description, image, grade, genre, price
         price,
         totalQuantity: quantity,
         remainingQuantity: quantity,
-        ownerId,   // 카드 소유자의 ID
+        ownerId, // 카드 소유자의 ID
         creatorId: ownerId, // 카드 생성자의 ID
-
       },
     });
 
@@ -93,18 +101,9 @@ async function createCardService({ name, description, image, grade, genre, price
   }
 }
 
-async function getMyCardList({
-  sort,
-  genre,
-  grade,
-  ownerId,
-  pageNum,
-  pageSize,
-  keyword,
-}) {
+async function getMyCardList({ sort, genre, grade, ownerId, pageNum, pageSize, keyword }) {
   try {
-
-    sort = sort && sortMapping[sort] ? sort : "recent";
+    sort = sort && sortMapping[sort] ? sort : 'recent';
     const orderBy = sortMapping[sort];
 
     // 기본 필터 설정
@@ -115,10 +114,11 @@ async function getMyCardList({
       name: keyword ? { contains: keyword } : undefined,
       // 판매 중 및 교환 중 상태를 제외
       NOT: [
-        { status: "AVAILABLE", shops: { some: {} } }, // 판매 중
-        { status: "IN_TRADE" }, // 교환 중
+        { status: 'AVAILABLE', shops: { some: {} } }, // 판매 중
+        { status: 'IN_TRADE' }, // 교환 중
       ],
     };
+    //  "remainingQuantity" > 0; 이 조건 추가?
 
     // 카드 데이터 가져오기
     const cards = await prisma.card.findMany({
@@ -153,17 +153,15 @@ async function getMyCardList({
     // console.log('API 응답 데이터 (서비스 계층):', result);
     // return result;
   } catch (error) {
-    console.error("MyGallery 카드 조회 실패:", error.message);
+    console.error('MyGallery 카드 조회 실패:', error.message);
     throw new Error(`카드 데이터 처리 실패: ${error.message}`);
   }
 }
 
-
 async function getMyCardById({ id }) {
   try {
-    
     if (!id || isNaN(id)) {
-      throw new Error("유효하지 않은 카드 ID입니다.");
+      throw new Error('유효하지 않은 카드 ID입니다.');
     }
 
     const card = await prisma.card.findUnique({
@@ -200,7 +198,7 @@ async function getMyCardById({ id }) {
 
     // 카드가 없는 경우 처리
     if (!card) {
-      throw new Error("해당 ID의 카드를 찾을 수 없습니다.");
+      throw new Error('해당 ID의 카드를 찾을 수 없습니다.');
     }
 
     return card;
@@ -209,7 +207,6 @@ async function getMyCardById({ id }) {
     throw new Error('보유한 카드 상세 조회 실패');
   }
 }
-
 
 export const getUserSalesCards = async ({
   sort,
@@ -224,7 +221,7 @@ export const getUserSalesCards = async ({
 }) => {
   try {
     // 정렬 설정
-    sort = sort && sortMapping[sort] ? sort : "recent";
+    sort = sort && sortMapping[sort] ? sort : 'recent';
     const orderBy = sortMapping[sort];
 
     // 기본 필터 생성
@@ -239,11 +236,11 @@ export const getUserSalesCards = async ({
     if (cardStatus) {
       filters.status = cardStatus; // 요청된 cardStatus만 필터
     } else {
-      filters.status = { in: ["AVAILABLE", "IN_TRADE"] }; // 기본 상태 필터
+      filters.status = { in: ['AVAILABLE', 'IN_TRADE'] }; // 기본 상태 필터
     }
 
     // 매진 여부 추가
-    if (sellout === "true") {
+    if (sellout === 'true') {
       filters.remainingQuantity = 0;
     } else {
       filters.remainingQuantity = { gt: 0 }; // 기본적으로 남은 수량이 0보다 큰 경우만
@@ -273,16 +270,11 @@ export const getUserSalesCards = async ({
 
     // 응답 반환
     return { data: { cards, totalCount, countsGroupByGrade: counts } };
-    
   } catch (error) {
-    console.error("MySales 카드 조회 실패:", error.message);
+    console.error('MySales 카드 조회 실패:', error.message);
     throw new Error(`카드 목록 조회 실패: ${error.message}`);
   }
 };
-
-
-
-
 
 export default {
   createUser,
@@ -291,6 +283,6 @@ export default {
   findAllUsers,
   getMyCardList,
   getMyCardById,
-  getUserSalesCards,  
+  getUserSalesCards,
   createCardService,
 };
