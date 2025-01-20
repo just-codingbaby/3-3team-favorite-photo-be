@@ -19,6 +19,7 @@ model User {
   lastclaimed   Int?
   alarms        Alarm[]
   cards         Card[]
+  createdCards  Card[]         @relation("CreatedCards")
   exchanges     Exchange[]     @relation("Requester")
   notifications Notification[]
   purchases     Purchase[]
@@ -36,9 +37,10 @@ model Notification {
 }
 
 model Card {
-  id                Int         @id @default(autoincrement())
+  id                Int          @id @default(autoincrement())
   ownerId           Int
-  name              String      @db.VarChar(255)
+  creatorId         Int
+  name              String       @db.VarChar(255)
   price             Int
   grade             Grade
   genre             Genre
@@ -46,12 +48,14 @@ model Card {
   totalQuantity     Int
   remainingQuantity Int
   imgUrl            String
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  status            CardStatus? @default(AVAILABLE)
-  owner             User        @relation(fields: [ownerId], references: [id])
-  exchangesOffered  Exchange[]  @relation("OfferedCard")
-  exchangesTarget   Exchange[]  @relation("TargetCard")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  status            CardStatus?  @default(AVAILABLE)
+  tradeStatus       TradeStatus? @default(CREATED)
+  owner             User         @relation(fields: [ownerId], references: [id])
+  creator           User         @relation("CreatedCards", fields: [creatorId], references: [id])
+  exchangesOffered  Exchange[]   @relation("OfferedCard")
+  exchangesTarget   Exchange[]   @relation("TargetCard")
   purchases         Purchase[]
   shops             Shop[]
 }
@@ -115,9 +119,9 @@ enum Genre {
 }
 
 enum CardStatus {
-  AVAILABLE
-  SOLD_OUT
-  IN_TRADE
+  AVAILABLE // 판매 중
+  SOLD_OUT // 거래 완료 (판매 or 교환)
+  IN_TRADE // 교환 대기 중
 }
 
 enum AlarmType {
@@ -127,4 +131,10 @@ enum AlarmType {
   PHOTO_CARD_SALE_SUCCESS
   PHOTO_CARD_OUT_OF_STOCK
   REWARD
+}
+
+enum TradeStatus {
+  CREATED // 생성된 상태
+  SOLD // 판매로 거래 완료
+  TRADED // 교환으로 거래 완료
 }

@@ -83,3 +83,7 @@ jspm_packages/
 
 # My Development Notes (Mostly Comments)
 authControllerNote.md
+schemaNote.md
+.envNote.md
+migrationsNote.md
+cardFiltersNote.md
