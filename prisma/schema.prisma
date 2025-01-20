@@ -83,14 +83,15 @@ model Exchange {
 }
 
 model Shop {
-  id        Int      @id @default(autoincrement())
-  sellerId  Int
-  cardId    Int
-  price     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  card      Card     @relation(fields: [cardId], references: [id])
-  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  id             Int      @id @default(autoincrement())
+  sellerId       Int
+  cardId         Int
+  price          Int
+  onSaleQuantity Int // 판매중인 카드 수량
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  card           Card     @relation(fields: [cardId], references: [id])
+  seller         User     @relation("Seller", fields: [sellerId], references: [id])
 }
 
 model Alarm {
@@ -119,7 +120,7 @@ enum Genre {
 }
 
 enum CardStatus {
-  AVAILABLE // 판매 중
+  AVAILABLE // 판매 중ㅣㅣ
   SOLD_OUT // 거래 완료 (판매 or 교환)
   IN_TRADE // 교환 대기 중
 }
