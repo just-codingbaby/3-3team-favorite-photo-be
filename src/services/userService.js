@@ -118,6 +118,7 @@ async function getMyCardList({ sort, genre, grade, ownerId, pageNum, pageSize, k
         { status: 'IN_TRADE' }, // 교환 중
       ],
     };
+    //  "remainingQuantity" > 0; 이 조건 추가?
 
     // 카드 데이터 가져오기
     const cards = await prisma.card.findMany({
