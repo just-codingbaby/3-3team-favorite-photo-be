@@ -3,10 +3,15 @@ import userService from '#services/userService.js';
 import { faker } from '@faker-js/faker';
 import { Genre, Grade } from '@prisma/client';
 
-async function getFilteredCards(skip, limit, sortField, sortOrder) {
+async function getFilteredCards(skip, limit, keyword, sortField, sortOrder) {
   return prisma.card.findMany({
     skip,
     take: limit,
+    where: {
+      name: {
+        contains: keyword,
+      },
+    },
     orderBy: {
       [sortField]: sortOrder,
     },
