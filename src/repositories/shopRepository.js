@@ -10,6 +10,7 @@ async function getFilteredCards(skip, limit, keyword, sortField, sortOrder) {
     where: {
       name: {
         contains: keyword,
+        mode: 'insensitive',
       },
     },
     orderBy: {
