@@ -1,6 +1,9 @@
 import prisma from '#config/prisma.js';
 import userRepository from '#repositories/userRepository.js';
 import { findUserByEmail } from '#services/authService.js';
+import { getMyCardFilters, getBasicFilters } from '#helpers/cardFilters.js';
+import sortMapping from '#utils/sortMapping.js';
+import { getGradeCounts }  from "#helpers/getGradeCounts.js";
 
 async function getAllUsers() {
   return userRepository.getAll();
@@ -77,7 +80,9 @@ async function createCardService({ name, description, image, grade, genre, price
         price,
         totalQuantity: quantity,
         remainingQuantity: quantity,
-        ownerId, // 생성한 사용자 ID
+        ownerId,   // 카드 소유자의 ID
+        creatorId: ownerId, // 카드 생성자의 ID
+
       },
     });
 
@@ -88,54 +93,59 @@ async function createCardService({ name, description, image, grade, genre, price
   }
 }
 
-
-// keyword: 카드 이름에서 특정 키워드가 포함된 항목만 필터링.
-// sellout: 매진 여부를 필터링. true인 경우 남은 수량(remainingQuantity)이 0인 카드만 조회
-async function getMyCardList({ sort, genre, sellout, grade, ownerId, pageNum, pageSize, keyword }) {
+async function getMyCardList({
+  sort,
+  genre,
+  grade,
+  ownerId,
+  pageNum,
+  pageSize,
+  keyword,
+}) {
   try {
+
+    sort = sort && sortMapping[sort] ? sort : "recent";
+    const orderBy = sortMapping[sort];
+
+    // 기본 필터 설정
+    const filters = {
+      ownerId: parseInt(ownerId, 10),
+      genre: genre || undefined,
+      grade: grade || undefined,
+      name: keyword ? { contains: keyword } : undefined,
+      // 판매 중 및 교환 중 상태를 제외
+      NOT: [
+        { status: "AVAILABLE", shops: { some: {} } }, // 판매 중
+        { status: "IN_TRADE" }, // 교환 중
+      ],
+    };
+
     // 카드 데이터 가져오기
     const cards = await prisma.card.findMany({
-      where: {
-        ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-        genre: genre || undefined,
-        grade: grade || undefined,
-        name: keyword ? { contains: keyword } : undefined,
-        remainingQuantity: sellout === 'true' ? 0 : undefined,
+      where: filters,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            nickName: true,
+          },
+        },
+        shops: {
+          select: {
+            id: true,
+          },
+        },
       },
-      orderBy: sort ? { [sort]: 'desc' } : undefined,
+      orderBy, // 정렬 조건 적용
       skip: (pageNum - 1) * pageSize,
       take: parseInt(pageSize, 10),
     });
 
     // 총 카드 수 계산
-    const totalCount = await prisma.card.count({
-      where: {
-        ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-        genre: genre || undefined,
-        grade: grade || undefined,
-        name: keyword ? { contains: keyword } : undefined,
-        remainingQuantity: sellout === 'true' ? 0 : undefined,
-      },
-    });
+    const totalCount = await prisma.card.count({ where: filters });
 
     // 등급별 카드 개수 계산
-    const countsGroupByGrade = await prisma.card.groupBy({
-      by: ['grade'],
-      where: {
-        ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-      },
-      _count: {
-        grade: true,
-      },
-    });
-
-    // 응답 데이터 형식화
-    const counts = {
-      COMMON: countsGroupByGrade.find((g) => g.grade === 'COMMON')?._count.grade || 0,
-      RARE: countsGroupByGrade.find((g) => g.grade === 'RARE')?._count.grade || 0,
-      SUPER_RARE: countsGroupByGrade.find((g) => g.grade === 'SUPER_RARE')?._count.grade || 0,
-      LEGENDARY: countsGroupByGrade.find((g) => g.grade === 'LEGENDARY')?._count.grade || 0,
-    };
+    const counts = await getGradeCounts(ownerId, genre, grade);
 
     return { data: { cards, totalCount, countsGroupByGrade: counts } };
 
@@ -143,13 +153,19 @@ async function getMyCardList({ sort, genre, sellout, grade, ownerId, pageNum, pa
     // console.log('API 응답 데이터 (서비스 계층):', result);
     // return result;
   } catch (error) {
-    console.error('나의 카드 데이터 가져오기 실패 (서비스 계층):', error.message);
-    throw new Error('나의 카드 데이터 가져오기 실패');
+    console.error("MyGallery 카드 조회 실패:", error.message);
+    throw new Error(`카드 데이터 처리 실패: ${error.message}`);
   }
 }
 
+
 async function getMyCardById({ id }) {
   try {
+    
+    if (!id || isNaN(id)) {
+      throw new Error("유효하지 않은 카드 ID입니다.");
+    }
+
     const card = await prisma.card.findUnique({
       where: {
         id: parseInt(id, 10),
@@ -167,8 +183,25 @@ async function getMyCardById({ id }) {
         imgUrl: true,
         createdAt: true,
         updatedAt: true,
+        owner: {
+          select: {
+            id: true,
+            nickName: true,
+          },
+        },
+        creator: {
+          select: {
+            id: true,
+            nickName: true,
+          },
+        },
       },
     });
+
+    // 카드가 없는 경우 처리
+    if (!card) {
+      throw new Error("해당 ID의 카드를 찾을 수 없습니다.");
+    }
 
     return card;
   } catch (error) {
@@ -177,75 +210,79 @@ async function getMyCardById({ id }) {
   }
 }
 
+
 export const getUserSalesCards = async ({
   sort,
   genre,
-  sellout,
+  sellout, // 매진 여부
   grade,
   ownerId,
-  pageNum,
-  pageSize,
+  pageNum = 1,
+  pageSize = 10,
   keyword,
-  cardStatus,
+  cardStatus, // 판매 상태: 판매 중, 교환 대기 중
 }) => {
   try {
-    // 카드 목록 가져오기
+    // 정렬 설정
+    sort = sort && sortMapping[sort] ? sort : "recent";
+    const orderBy = sortMapping[sort];
+
+    // 기본 필터 생성
+    const filters = {
+      ownerId: parseInt(ownerId, 10),
+      genre: genre || undefined,
+      grade: grade || undefined,
+      name: keyword ? { contains: keyword } : undefined,
+    };
+
+    // 상태 필터 추가 (판매 중, 교환 대기 중)
+    if (cardStatus) {
+      filters.status = cardStatus; // 요청된 cardStatus만 필터
+    } else {
+      filters.status = { in: ["AVAILABLE", "IN_TRADE"] }; // 기본 상태 필터
+    }
+
+    // 매진 여부 추가
+    if (sellout === "true") {
+      filters.remainingQuantity = 0;
+    } else {
+      filters.remainingQuantity = { gt: 0 }; // 기본적으로 남은 수량이 0보다 큰 경우만
+    }
+
+    // 카드 데이터 가져오기
     const cards = await prisma.card.findMany({
-      where: {
-        ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-        genre: genre || undefined,
-        grade: grade || undefined,
-        name: keyword ? { contains: keyword } : undefined,
-        remainingQuantity: sellout === 'true' ? 0 : undefined,
-        status: cardStatus || undefined,
+      where: filters,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            nickName: true,
+          },
+        },
       },
-      orderBy: sort ? { [sort]: 'desc' } : undefined,
+      orderBy,
       skip: (pageNum - 1) * pageSize,
       take: parseInt(pageSize, 10),
     });
 
     // 총 카드 수 계산
-    const totalCount = await prisma.card.count({
-      where: {
-        ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-        genre: genre || undefined,
-        grade: grade || undefined,
-        name: keyword ? { contains: keyword } : undefined,
-        remainingQuantity: sellout === 'true' ? 0 : undefined,
-        status: cardStatus || undefined,
-      },
-    });
+    const totalCount = await prisma.card.count({ where: filters });
 
-    // 등급별 카드 개수 계산
-    const countsGroupByGrade = await prisma.card.groupBy({
-      by: ['grade'],
-      where: {
-        ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-        genre: genre || undefined,
-        grade: grade || undefined,
-        name: keyword ? { contains: keyword } : undefined,
-        remainingQuantity: sellout === 'true' ? 0 : undefined,
-        status: cardStatus || undefined,
-      },
-      _count: {
-        grade: true,
-      },
-    });
+    // 등급별 카드 수 계산
+    const counts = await getGradeCounts(ownerId, genre, grade);
 
-    // 응답 데이터 형식화
-    const counts = {
-      COMMON: countsGroupByGrade.find((g) => g.grade === 'COMMON')?._count.grade || 0,
-      RARE: countsGroupByGrade.find((g) => g.grade === 'RARE')?._count.grade || 0,
-      SUPER_RARE: countsGroupByGrade.find((g) => g.grade === 'SUPER_RARE')?._count.grade || 0,
-      LEGENDARY: countsGroupByGrade.find((g) => g.grade === 'LEGENDARY')?._count.grade || 0,
-    };
-
-    return { data: { shops: cards, totalCount, countsGroupByGrade: counts } };
+    // 응답 반환
+    return { data: { cards, totalCount, countsGroupByGrade: counts } };
+    
   } catch (error) {
-    console.error('상점에 등록한 나의 카드 목록 조회 실패 (서비스 계층):', error.message);
-    throw new Error('상점에 등록한 나의 카드 목록 조회 실패');
+    console.error("MySales 카드 조회 실패:", error.message);
+    throw new Error(`카드 목록 조회 실패: ${error.message}`);
   }
 };
+
+
+
+
 
 export default {
   createUser,
