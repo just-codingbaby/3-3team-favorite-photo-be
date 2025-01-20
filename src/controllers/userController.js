@@ -1,6 +1,6 @@
+import sortMapping from '#utils/sortMapping.js';
 import express from 'express';
 import userService from '../services/userService.js';
-import sortMapping from '#utils/sortMapping.js';
 
 const userController = express.Router();
 
@@ -23,8 +23,8 @@ userController.post('/', async (req, res) => {
 
 export const getProfile = async (req, res) => {
   //  #swagger.tags = ['Users']
-  const { email } = req.params;  
-  
+  const { email } = req.params;
+
   try {
     if (!email) {
       return res.status(400).json({ message: '이메일이 제공되지 않았습니다' });
@@ -47,7 +47,7 @@ export const createMyCard = async (req, res) => {
       return res.status(401).json({ message: '사용자 인증이 필요합니다.' });
     }
     if (process.env.NODE_ENV === 'development') {
-    console.log('createMyCard 인증된 사용자:', req.user);
+      console.log('createMyCard 인증된 사용자:', req.user);
     }
 
     // 필수 값 검증
@@ -89,7 +89,7 @@ export const getMyCardList = async (req, res) => {
     // const ownerId = req.user.id;
 
     if (!ownerId) {
-      return res.status(400).json({ message: "ownerId가 필요합니다." });
+      return res.status(400).json({ message: 'ownerId가 필요합니다.' });
     }
 
     // 정렬 값 검증
@@ -101,7 +101,7 @@ export const getMyCardList = async (req, res) => {
     // 서비스 호출
     const result = await userService.getMyCardList({
       sort: prismaSort || 'recent', // 검증된 정렬 값 또는 기본값
-      genre,      
+      genre,
       grade,
       ownerId,
       pageNum,
@@ -131,7 +131,7 @@ export const getUserSalesCards = async (req, res) => {
     } = req.query;
 
     if (!ownerId) {
-      return res.status(400).json({ message: "ownerId가 필요합니다." });
+      return res.status(400).json({ message: 'ownerId가 필요합니다.' });
     }
 
     // 정렬 값 검증

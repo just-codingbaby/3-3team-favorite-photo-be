@@ -3,14 +3,14 @@ import jwt from 'jsonwebtoken';
 
 export const checkEmailExists = async (req, res, next) => {
   const { email } = req.body;
-  
+
   if (!email) {
     return res.status(400).json({ message: '이메일이 제공되지 않았습니다.' });
   }
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-  
+
     if (!user) {
       console.log('checkEmailExists - 존재하지 않는 이메일:', email);
       return res.status(404).json({ message: '존재하지 않는 이메일입니다.' });
@@ -24,11 +24,10 @@ export const checkEmailExists = async (req, res, next) => {
 };
 
 export const authMiddleware = (req, res, next) => {
-
   const token = req.cookies.accessToken;
   // console.log('Token Received:', token); // 받은 토큰 출력
   if (!token) {
-    return res.status(401).send("인증이 필요합니다.");
+    return res.status(401).send('인증이 필요합니다.');
   }
 
   try {
