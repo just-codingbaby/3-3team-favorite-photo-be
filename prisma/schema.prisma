@@ -1,10 +1,3 @@
-generator markdown {
-  provider = "prisma-markdown"
-  output   = "./ERD.md"
-  title    = "ERD"
-}
-
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres"]
@@ -90,15 +83,14 @@ model Exchange {
 }
 
 model Shop {
-  id             Int      @id @default(autoincrement())
-  sellerId       Int
-  cardId         Int
-  price          Int
-  onSaleQuantity Int // 판매중인 카드 수량
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  card           Card     @relation(fields: [cardId], references: [id])
-  seller         User     @relation("Seller", fields: [sellerId], references: [id])
+  id        Int      @id @default(autoincrement())
+  sellerId  Int
+  cardId    Int
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id])
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
 }
 
 model Alarm {
