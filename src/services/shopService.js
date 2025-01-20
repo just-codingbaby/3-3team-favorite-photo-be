@@ -21,16 +21,16 @@ const CardGradeFilterEnum = {
 };
 
 async function getCardList(skip, limit, keyword, filterName, filterValue, sortField, sortOrder) {
-  let covertStrToEnum;
+  let convertStrToEnum;
 
   if (filterName === 'status') {
-    covertStrToEnum = CardStatusFilterEnum[filterValue];
+    convertStrToEnum = CardStatusFilterEnum[filterValue];
   }
   if (filterName === 'genre') {
-    covertStrToEnum = CardGenreFilterEnum[filterValue];
+    convertStrToEnum = CardGenreFilterEnum[filterValue];
   }
   if (filterName === 'grade') {
-    covertStrToEnum = CardGradeFilterEnum[filterValue];
+    convertStrToEnum = CardGradeFilterEnum[filterValue];
   }
 
   // console.log(covertStrToEnum);
