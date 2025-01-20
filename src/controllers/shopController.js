@@ -10,6 +10,15 @@ shopController.get('/', async (req, res) => {
   const skip = (page - 1) * limit;
   const sortField = req.query.sortField || 'createdAt';
   const sortOrder = req.query.sortOrder || 'desc';
+  const validSortFields = ['createdAt', 'price'];
+  const validSortOrders = ['asc', 'desc'];
+  if (!validSortFields.includes(sortField)) {
+    return res.status(400).json({ message: '유효하지 않은 정렬 필드입니다.' });
+  }
+
+  if (!validSortOrders.includes(sortOrder)) {
+    return res.status(400).json({ message: '유효하지 않은 정렬 순서입니다.' });
+  }
   try {
     const cards = await shopService.getCardList(skip, limit, sortField, sortOrder);
     res.json(cards);
