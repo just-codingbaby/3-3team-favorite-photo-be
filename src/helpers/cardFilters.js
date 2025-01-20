@@ -10,39 +10,38 @@ export const getBasicFilters = (ownerId, genre, grade, keyword) => {
 };
 
 // 내가 생성한 카드 필터
-export const getCreatedCardFilters = (ownerId) => {
-  return {    
-    creatorId: ownerId ? parseInt(ownerId, 10) : undefined,
-    tradeStatus: "CREATED",
-  };
-};
+// export const getCreatedCardFilters = (ownerId) => {
+//   return {
+//     creatorId: ownerId ? parseInt(ownerId, 10) : undefined,
+//     tradeStatus: 'CREATED',
+//   };
+// };
 
 // 내가 구매한 카드 필터
 export const getPurchasedCardFilters = (ownerId) => {
   return {
     ownerId: ownerId ? parseInt(ownerId, 10) : undefined, // 현재 사용자가 소유자
     // NOT: { creatorId: ownerId }, // 본인이 생성하지 않은 카드
-    tradeStatus: "SOLD", // 판매 완료 상태
+    tradeStatus: 'SOLD', // 판매 완료 상태
   };
 };
-
 
 // 내가 교환 완료한 카드 필터
 export const getTradedCardFilters = (ownerId) => {
   return {
     ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
-    tradeStatus: "TRADED",
+    tradeStatus: 'TRADED',
   };
 };
 
 // groupBy 쿼리용 필터
 export const getGroupByFilters = (ownerId, genre, grade) => {
-  return {    
+  return {
     ownerId: ownerId ? parseInt(ownerId, 10) : undefined,
     genre: genre || undefined,
     grade: grade || undefined,
     OR: [
-      getCreatedCardFilters(ownerId),
+      // getCreatedCardFilters(ownerId),
       getPurchasedCardFilters(ownerId),
       getTradedCardFilters(ownerId),
     ],
@@ -55,7 +54,7 @@ export const getMyCardFilters = (ownerId, genre, grade, keyword) => {
   return {
     ...basicFilters,
     OR: [
-       { ...getCreatedCardFilters(ownerId), status: { not: "AVAILABLE" } }, // 판매 중이 아닌 본인이 생성한 카드
+      // { ...getCreatedCardFilters(ownerId), status: { not: 'AVAILABLE' } }, // 판매 중이 아닌 본인이 생성한 카드
       getPurchasedCardFilters(ownerId),
       getTradedCardFilters(ownerId),
     ],
