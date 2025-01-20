@@ -1,6 +1,7 @@
 import express from 'express';
-import upload from '../middlewares/uploadMiddleware.js'; // 파일 업로드 미들웨어
 import { authMiddleware } from '../middlewares/authMiddleware.js'; // 사용자 인증 미들웨어
+import upload from '../middlewares/uploadMiddleware.js'; // 파일 업로드 미들웨어
+
 import userService from '../services/userService.js'; // 포토카드 생성 서비스
 
 const createCardRouter = express.Router();
@@ -12,7 +13,7 @@ createCardRouter.post('/my-cards', authMiddleware, upload.single('file'), async 
     if (!req.file) {
       return res.status(400).json({ message: '파일 업로드 실패. 파일을 확인하세요.' });
     }
-    
+
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`; // 업로드된 파일 경로. 절대 경로 생성
     const { name, description, grade, genre, price, quantity } = JSON.parse(req.body.data || '{}');
 
@@ -23,9 +24,8 @@ createCardRouter.post('/my-cards', authMiddleware, upload.single('file'), async 
 
     if (process.env.NODE_ENV === 'development') {
       console.log('파일:', req.file.filename);
-      console.log('사용자 ID', req.user.id);      
-      }
-  
+      console.log('사용자 ID', req.user.id);
+    }
 
     // 필수 값 검증
     if (!name || !grade || !genre || !price || !quantity) {
