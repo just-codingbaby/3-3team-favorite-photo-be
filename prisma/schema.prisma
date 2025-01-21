@@ -13,13 +13,13 @@ model User {
   nickName      String         @unique @db.VarChar(255)
   password      String         @db.VarChar(255)
   email         String?        @unique @db.VarChar(255)
-  points        Int?           @default(0)
+  points        Int?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   lastclaimed   Int?
   alarms        Alarm[]
-  cards         Card[]
   createdCards  Card[]         @relation("CreatedCards")
+  cards         Card[]
   exchanges     Exchange[]     @relation("Requester")
   notifications Notification[]
   purchases     Purchase[]
@@ -39,7 +39,6 @@ model Notification {
 model Card {
   id                Int          @id @default(autoincrement())
   ownerId           Int
-  creatorId         Int
   name              String       @db.VarChar(255)
   price             Int
   grade             Grade
@@ -51,9 +50,10 @@ model Card {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   status            CardStatus?  @default(AVAILABLE)
+  creatorId         Int
   tradeStatus       TradeStatus? @default(CREATED)
-  owner             User         @relation(fields: [ownerId], references: [id])
   creator           User         @relation("CreatedCards", fields: [creatorId], references: [id])
+  owner             User         @relation(fields: [ownerId], references: [id])
   exchangesOffered  Exchange[]   @relation("OfferedCard")
   exchangesTarget   Exchange[]   @relation("TargetCard")
   purchases         Purchase[]
@@ -83,15 +83,14 @@ model Exchange {
 }
 
 model Shop {
-  id             Int      @id @default(autoincrement())
-  sellerId       Int
-  cardId         Int
-  price          Int
-  onSaleQuantity Int // 판매중인 카드 수량
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  card           Card     @relation(fields: [cardId], references: [id])
-  seller         User     @relation("Seller", fields: [sellerId], references: [id])
+  id        Int      @id @default(autoincrement())
+  sellerId  Int
+  cardId    Int
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id])
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
 }
 
 model Alarm {
@@ -120,9 +119,9 @@ enum Genre {
 }
 
 enum CardStatus {
-  AVAILABLE // 판매 중
-  SOLD_OUT // 거래 완료 (판매 or 교환)
-  IN_TRADE // 교환 대기 중
+  AVAILABLE
+  SOLD_OUT
+  IN_TRADE
 }
 
 enum AlarmType {
@@ -135,7 +134,7 @@ enum AlarmType {
 }
 
 enum TradeStatus {
-  CREATED // 생성된 상태
-  SOLD // 판매로 거래 완료
-  TRADED // 교환으로 거래 완료
+  CREATED
+  SOLD
+  TRADED
 }

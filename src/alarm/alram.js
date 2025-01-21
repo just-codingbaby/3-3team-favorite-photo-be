@@ -69,7 +69,7 @@ app.delete('/api/alarms/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
+//
 // POST: 랜덤 포인트 생성
 app.post('/api/claim-points', async (req, res) => {
   const { userId } = req.body;
